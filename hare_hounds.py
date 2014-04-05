@@ -59,7 +59,7 @@ class Position(object):
 
 
 # === Problem 1
-class RectangularRoom(object):
+class Board(object):
     """
     A RectangularRoom represents a rectangular region containing clean or dirty
     tiles.
@@ -67,7 +67,7 @@ class RectangularRoom(object):
     A room has a width and a height and contains (width * height) tiles. At any
     particular time, each of these tiles is either clean or dirty.
     """
-    def __init__(self, width, height):
+    def __init__(self):
         """
         Initializes a rectangular room with the specified width and height.
 
@@ -76,14 +76,19 @@ class RectangularRoom(object):
         width: an integer > 0
         height: an integer > 0
         """
-        self.width = width 
-        self.height = height
-        self.tiles = []
-        for i in range(height):
-            row = []
-            for j in range(width):
-                row += [False]
-            self.tiles += [row]
+        tiles = {}
+        tiles[(0,1)] = ((0,2),(1,0),(1,1),(1,2))
+        tiles[(0,2)] = ((0,1),(0,3),(1,2))
+        tiles[(0,3)] = ((0,2),(1,2),(1,3),(1,4))
+        tiles[(1,0)] = ((0,1),(1,1),(2,1))
+        tiles[(1,1)] = ((0,1),(1,0),(1,2),(2,1))
+        tiles[(1,2)] = ((0,1),(0,2),(0,3),(1,1),(1,3),(2,1),(2,2),(2,3))
+        tiles[(1,3)] = ((0,3),(1,2),(1,4),(2,3))
+        tiles[(1,4)] = ((0,3),(1,3),(2,3))
+        tiles[(2,1)] = ((1,0),(1,1),(1,2),(2,2))
+        tiles[(2,2)] = ((1,2),(2,1),(2,3))
+        tiles[(2,3)] = ((1,2),(1,3),(1,4),(2,2))
+
         #raise NotImplementedError
     
     def cleanTileAtPosition(self, pos):
