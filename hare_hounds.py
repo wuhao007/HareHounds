@@ -23,7 +23,6 @@ rules = {
 ( 9,True):[6,8,10,11],
 (10,True):[6,7,9,11],
 (11,True):[8,9,10],
-
 ( 1,False):[2,3,4],
 ( 2,False):[3,5,6],
 ( 3,False):[2,4,6],
@@ -36,15 +35,19 @@ rules = {
 (10,False):[9,11],
 (11,False):[],
 }
-hare = 11
-hounds = [1,2,4]
-
 def trap(hare):
     moves = []
     for position in rules[(hare, True)]:
         if position not in hounds:
             moves += [position]
     return moves
-moves = trap(hare)
-while (hare != 1 or moves != []):
-    hare = moves[0]
+import random
+def simulate():
+    hare = 11
+    hounds = [1,2,4]
+    moves = trap(hare)
+    while (hare != 1 or moves != []):
+        print "hare ", moves, hare
+        hare = random.choice(moves)
+        moves = trap(hare)
+simulate()
