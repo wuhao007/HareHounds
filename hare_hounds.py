@@ -1,41 +1,53 @@
 #   d-o-o
 #  /|\|/|\
-# d-o-o-o-True
+# d-o-o-o-r
 #  \|/|\|/
 #   d-o-o
 # 
 #
-#     2-5-8   
+#     1-4-7   
 #    /|\|/|\
-#   1-3-6-9-11
+#   0-2-5-8-10
 #    \|/|\|/
-#     4-7-10   
+#     3-6-9   
 # 
 rules = { 
-( 1,True):[2,3,4],
-( 2,True):[1,3,5,6],
-( 3,True):[1,2,4,6],
-( 4,True):[1,3,6,7],
-( 5,True):[2,6,8],
-( 6,True):[2,3,4,5,7,8,9,10],
-( 7,True):[4,6,10],
-( 8,True):[5,6,9,11],
-( 9,True):[6,8,10,11],
-(10,True):[6,7,9,11],
-(11,True):[8,9,10],
-( 1,False):[2,3,4],
-( 2,False):[3,5,6],
-( 3,False):[2,4,6],
-( 4,False):[3,6,7],
-( 5,False):[6,8],
-( 6,False):[5,7,8,9,10],
-( 7,False):[6,10],
-( 8,False):[9,11],
-( 9,False):[8,10,11],
-(10,False):[9,11],
-(11,False):[],
+( 0,True):[1,2,3],
+( 1,True):[0,2,4,5],
+( 2,True):[0,1,3,5],
+( 3,True):[0,2,5,6],
+( 4,True):[1,5,7],
+( 5,True):[1,2,3,4,6,7,8,9],
+( 6,True):[3,5,9],
+( 7,True):[4,5,8,10],
+( 8,True):[5,7,9,10],
+(9,True):[5,6,8,10],
+(10,True):[7,8,9],
+( 0,False):[1,2,3],
+( 1,False):[2,4,5],
+( 2,False):[1,3,5],
+( 3,False):[2,5,6],
+( 4,False):[5,7],
+( 5,False):[4,6,7,8,9],
+( 6,False):[5,9],
+( 7,False):[8,10],
+( 8,False):[7,9,10],
+(9,False):[8,10],
+(10,False):[],
 }
-def trap(hare):
+def print_board(hare, hounds):
+    positions = ['o']*11 
+    positions[hare] = 'r'
+    for hound in hounds:
+        positions[hound] = 'd'
+    print '  ' + positions[1] + '-' + positions[4] + '-' + positions[7]
+    print ' /|\\|/|\\'
+    print positions[0] + '-' + positions[2] + '-' + positions[5] + '-' + positions[8] + '-' + positions[10]
+    print ' \\|/|\\|/'
+    print '  ' + positions[3] + '-' + positions[6] + '-' + positions[9]
+    print 
+
+def trap(hare, hounds):
     moves = []
     for position in rules[(hare, True)]:
         if position not in hounds:
@@ -43,11 +55,11 @@ def trap(hare):
     return moves
 import random
 def simulate():
-    hare = 11
-    hounds = [1,2,4]
-    moves = trap(hare)
-    while (hare != 1 or moves != []):
-        print "hare ", moves, hare
+    hare = 10
+    hounds = [0,1,3]
+    moves = trap(hare, hounds)
+    while (hare != 2 and moves != []):
         hare = random.choice(moves)
-        moves = trap(hare)
+        print_board(hare, hounds)
+        moves = trap(hare, hounds)
 simulate()
