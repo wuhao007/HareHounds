@@ -72,7 +72,19 @@ def hounds_positions(hare, hounds):
     return choose_move(moves)
         
 def who_win(hare, hounds):
-    if hare < min(hounds):
+    def get_col(position):
+        if position == 0:
+            return 0
+        elif position in (1,2,3):
+            return 1
+        elif position in (4,5,6):
+            return 2
+        elif position in (7,8,9):
+            return 3
+        elif position == 10:
+            return 4
+
+    if get_col(hare) <= get_col(min(hounds)):
         print '=====hare win====='
         return True
     elif hare_positions(hare, hounds) == None:
@@ -102,7 +114,7 @@ def simulate():
         if (who_win(hare, hounds)):
             break;
 
-for i in range(10000):
+for i in range(1000):
     simulate()
 #simulate()
 
