@@ -32,7 +32,7 @@ rules = {
 ( 6,False):(5,9),
 ( 7,False):(8,10),
 ( 8,False):(7,9,10),
-(9,False):(8,10),
+( 9,False):(8,10),
 (10,False):(),
 }
 def print_board(hare, hounds):
@@ -47,27 +47,62 @@ def print_board(hare, hounds):
     print '  ' + positions[3] + '-' + positions[6] + '-' + positions[9]
     print 
 
-def hare_positions(hare, hounds):
-    moves = [position for position in rules[(hare, True)] if position not in hounds]
+def choose_move(moves):
     if moves != []:
         return random.choice(moves)
     else:
         return None
 
+def hare_positions(hare, hounds):
+   return choose_move([position for position in rules[(hare, True)] if position not in hounds])
+
 def hounds_positions(hare, hounds):
+    #hounds_moves = [[position for position in rules[(hound, False)] if position != hare] for hound in hounds]
     moves = []
-    for move in [[position for position in rules[(hound, False)] if position != hare] for hound in hounds]:
-        if moves != []:
-            return random.choice(moves)
-        else:
-            return None
+    for i in range(len(hounds)):
+        for hound_move in rules[(hounds[i], False)]:
+            if (hound_move != hare) and (hound_move not in hounds):
+                hounds_move = hounds[:]
+                hounds_move[i] = hound_move
+                moves += [hounds_move]
+    #print 'S================================================='
+    #for move in moves:
+    #    print_board(hare, move)
+    #print 'E================================================='
+    return choose_move(moves)
+        
+def who_win(hare, hounds):
+    if hare < min(hounds):
+        print '=====hare win====='
+        return True
+    elif hare_positions(hare, hounds) == None:
+        print '=====hounds win====='
+        return True
+    elif hounds_positions(hare, hounds) == None:
+        print '=====hare win====='
+        return True 
+    else:
+        return False
 
 import random
 def simulate():
     hare = 10
     hounds = [0,1,3]
-    while (hare != 2 and hare != None):
-        print_board(hare, hounds)
-        hare = hare_positions(hare, hounds)
+    print_board(hare, hounds)
+    while (who_win(hare, hounds) == False):
+        print '=====hounds====='
         hounds = hounds_positions(hare, hounds)
-simulate()
+        print_board(hare, hounds)
+        if (who_win(hare, hounds)):
+            break;
+
+        print '======hare======'
+        hare = hare_positions(hare, hounds)
+        print_board(hare, hounds)
+        if (who_win(hare, hounds)):
+            break;
+
+for i in range(10000):
+    simulate()
+#simulate()
+
