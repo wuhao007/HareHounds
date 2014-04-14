@@ -54,7 +54,7 @@ def choose_move(moves):
         return None
 
 def hare_positions(hare, hounds):
-   return choose_move([position for position in rules[(hare, True)] if position not in hounds])
+    return choose_move([position for position in rules[(hare, True)] if position not in hounds])
 
 def hounds_positions(hare, hounds):
     #hounds_moves = [[position for position in rules[(hound, False)] if position != hare] for hound in hounds]
@@ -85,36 +85,43 @@ def who_win(hare, hounds):
             return 4
 
     if get_col(hare) <= get_col(min(hounds)):
-        print '=====hare win====='
+        #print '=====hare win====='
         return True
     elif hare_positions(hare, hounds) == None:
-        print '=====hounds win====='
-        return True
-    elif hounds_positions(hare, hounds) == None:
-        print '=====hare win====='
-        return True 
-    else:
+        #print '=====hounds win====='
         return False
+    #elif hounds_positions(hare, hounds) == None:
+    #    print '=====hare win====='
+    #    return True 
+    else:
+        return None
 
 import random
-def simulate():
+def simulate(hare, hounds, turn = False):
+    #print_board(hare, hounds)
+    while True:
+        if turn:
+            turn = False
+            #print '======hare======'
+            hare = hare_positions(hare, hounds)
+        else:
+            turn = True
+            #print '=====hounds====='
+            hounds = hounds_positions(hare, hounds)
+        #print_board(hare, hounds)
+        winer = who_win(hare, hounds)
+        if winer != None:
+            return winer
+
+def score_simulate():
     hare = 10
     hounds = [0,1,3]
-    print_board(hare, hounds)
-    while (who_win(hare, hounds) == False):
-        print '=====hounds====='
-        hounds = hounds_positions(hare, hounds)
-        print_board(hare, hounds)
-        if (who_win(hare, hounds)):
-            break;
+    score = [0, 0]
+    for i in range(1000):
+        if simulate(hare, hounds):
+            score[0] += 1
+        else:
+            score[1] += 1
+    return score
 
-        print '======hare======'
-        hare = hare_positions(hare, hounds)
-        print_board(hare, hounds)
-        if (who_win(hare, hounds)):
-            break;
-
-for i in range(1000):
-    simulate()
-#simulate()
-
+print score_simulate()
