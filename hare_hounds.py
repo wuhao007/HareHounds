@@ -128,46 +128,56 @@ def play():
             break
         you = raw_input('choose sides hare or hounds: ')
 
-    turn = raw_input('first? yes or no: ')
-    while True:
-        if turn == 'yes':
-            turn = True
-            break
-        elif turn == 'no':
-            turn = False
-            break
-        turn = raw_input('first? yes or no: ')
+    #turn = raw_input('first? yes or no: ')
+    #while True:
+    #    if turn == 'yes':
+    #        turn = True
+    #        break
+    #    elif turn == 'no':
+    #        turn = False
+    #        break
+    #    turn = raw_input('first? yes or no: ')
         
-
+    turn = True
     print_board(hare, hounds)
     while True:
         if turn:
             if you:
-                print '======hare======'
-                hare = int(raw_input('choose position: ' + str(hare_positions(hare, hounds)) + ': '))
-                print_board(hare, hounds)
-            else:
-                print '======hounds======'
-                hound = int(raw_input('choose hound: ' + str(hounds) + ': '))
-                hounds[hounds.index(hound)] = int(raw_input('choose position: ' + str(hound_positions(hare, hounds, hound)) + ': '))
-                print_board(hare, hounds)
-            turn = False
-        else:
-            if not you:
-                print '=====hare====='
-                move_score = {}
-                for move in hare_positions(hare, hounds):
-                    move_score[score_simulate(move, hounds, True)[0]] = move
-                print move_score
-                hare = move_score[max(move_score.keys())]
-                print_board(hare, hounds)
-            else:
                 print '=====hounds====='
                 move_score = {}
                 for move in hounds_positions(hare, hounds):
                     move_score[score_simulate(hare, move, False)[1]] = move
                 print move_score
                 hounds = move_score[max(move_score.keys())]
+                print_board(hare, hounds)
+            else:
+                print '======hounds======'
+                hound = int(raw_input('choose hound: ' + str(hounds) + ': '))
+                while hound not in hounds:
+                    hound = int(raw_input('choose hound: ' + str(hounds) + ': '))
+                positions = hound_positions(hare, hounds, hound)
+                position = int(raw_input('choose position: ' + str(positions) + ': '))
+                while position not in positions:
+                    position = int(raw_input('choose position: ' + str(positions) + ': '))
+                hounds[hounds.index(hound)] = position
+                print_board(hare, hounds)
+            turn = False
+        else:
+            if you:
+                print '======hare======'
+                positions = hare_positions(hare, hounds)
+                position = int(raw_input('choose position: ' + str(positions) + ': '))
+                while position not in positions:
+                    position = int(raw_input('choose position: ' + str(positions) + ': '))
+                hare = position
+                print_board(hare, hounds)
+            else:
+                print '=====hare====='
+                move_score = {}
+                for move in hare_positions(hare, hounds):
+                    move_score[score_simulate(move, hounds, True)[0]] = move
+                print move_score
+                hare = move_score[max(move_score.keys())]
                 print_board(hare, hounds)
             turn = True
                 
