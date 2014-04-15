@@ -32,106 +32,108 @@ hound_rules.put(9, new IntList(Arrays.asList(8,10)));
 hound_rules.put(10, new IntList());
 
 // Using an enhanced loop to interate over each entry
-for (Map.Entry me : hare_rules.entrySet()) {
-  println(me.getKey() + " is ");
-  println(me.getValue());
-}
+//for (Map.Entry me : hare_rules.entrySet()) {
+//  println(me.getKey() + " is ");
+//  println(me.getValue());
+//}
 
-
-int hare = 10;
-IntList hounds = new IntList(Arrays.asList(0,1,3));
-println("choose sides hare(r) or hounds(d): ");
-boolean you;
-while (true)
+void draw()
 {
-  if (keyPressed) 
-  {
-    if (key == 'r') 
-    {
-      you = true;
-      break;
-    }
-    else if (key == 'd')
-    {
-      you = false;
-      break;
-    }
-  }
+  int hare = 10;
+  IntList hounds = new IntList(Arrays.asList(0,1,3));
   println("choose sides hare(r) or hounds(d): ");
-}    
-boolean turn = true;
-//print_board(hare, hounds);
-while (true)
-{
-  if (turn)
+  boolean you;
+  while (true)
   {
-    if (you)
+    if (keyPressed) 
     {
-      println("=====hounds=====");
-      HashMap<Integer, IntList> move_score = new HashMap<Integer, IntList>();
-      //for move in hounds_positions(hare, hounds)
-      //{
-      //  move_score[score_simulate(hare, move, False)[1]] = move
-      //}
-      //println(move_score);
-      //hounds = move_score[max(move_score.keys())];
-      //print_board(hare, hounds)
+      if (key == 'r') 
+      {
+	you = true;
+	break;
+      }
+      else if (key == 'd')
+      {
+	you = false;
+	break;
+      }
+      println("choose sides hare(r) or hounds(d): ");
+    }
+    
+  }    
+  boolean turn = true;
+  //print_board(hare, hounds);
+
+  while (true)
+  {
+    if (turn)
+    {
+      if (you)
+      {
+	println("=====hounds=====");
+	HashMap<Integer, IntList> move_score = new HashMap<Integer, IntList>();
+	//for move in hounds_positions(hare, hounds)
+	//{
+	//  move_score[score_simulate(hare, move, False)[1]] = move
+	//}
+	//println(move_score);
+	//hounds = move_score[max(move_score.keys())];
+	//print_board(hare, hounds)
+      }
+      else
+      {
+	println("======hounds======");
+	//hound = int(raw_input('choose hound: ' + str(hounds) + ': '))
+	//positions = hound_positions(hare, hounds, hound)
+	//while (hound not in hounds) or positions == []
+	//{
+	//  hound = int(raw_input('choose hound: ' + str(hounds) + ': '))
+	//  positions = hound_positions(hare, hounds, hound)
+	//  position = int(raw_input('choose position: ' + str(positions) + ': '))
+	//}
+	//while position not in positions
+	//{
+	//  position = int(raw_input('choose position: ' + str(positions) + ': '))
+	//}
+	//hounds[hounds.index(hound)] = position
+	//print_board(hare, hounds)
+      }
+      turn = false;
     }
     else
     {
-      println("======hounds======");
-      //hound = int(raw_input('choose hound: ' + str(hounds) + ': '))
-      //positions = hound_positions(hare, hounds, hound)
-      //while (hound not in hounds) or positions == []
-      //{
-      //  hound = int(raw_input('choose hound: ' + str(hounds) + ': '))
-      //  positions = hound_positions(hare, hounds, hound)
-      //  position = int(raw_input('choose position: ' + str(positions) + ': '))
-      //}
-      //while position not in positions
-      //{
-      //  position = int(raw_input('choose position: ' + str(positions) + ': '))
-      //}
-      //hounds[hounds.index(hound)] = position
-      //print_board(hare, hounds)
-    }
-    turn = false;
+      if (you)
+      {
+	println("======hare======");
+	//positions = hare_positions(hare, hounds)
+	//position = int(raw_input('choose position: ' + str(positions) + ': '))
+	//while position not in positions
+	//{
+	//  position = int(raw_input('choose position: ' + str(positions) + ': '))
+	//}
+	//hare = position
+	//print_board(hare, hounds)
+      }
+      else
+      {
+	println("=====hare=====");
+	//move_score = {}
+	//for move in hare_positions(hare, hounds)
+	//{
+	//          move_score[score_simulate(move, hounds, True)[0]] = move
+	//}
+	//hare = move_score[max(move_score.keys())]
+	//print_board(hare, hounds)
+      }
+      turn = true;
+    }             
+    //winer = who_win(hare, hounds)
+    //if (winer != None)
+    //{
+    //  return winer
+    //}
   }
-  else
-  {
-    if (you)
-    {
-      println("======hare======");
-      //positions = hare_positions(hare, hounds)
-      //position = int(raw_input('choose position: ' + str(positions) + ': '))
-      //while position not in positions
-      //{
-      //  position = int(raw_input('choose position: ' + str(positions) + ': '))
-      //}
-      //hare = position
-      //print_board(hare, hounds)
-    }
-    else
-    {
-      println("=====hare=====");
-      //move_score = {}
-      //for move in hare_positions(hare, hounds)
-      //{
-      //          move_score[score_simulate(move, hounds, True)[0]] = move
-      //}
-      //hare = move_score[max(move_score.keys())]
-      //print_board(hare, hounds)
-    }
-    turn = true;
-  }             
-  //winer = who_win(hare, hounds)
-  //if (winer != None)
-  //{
-  //  return winer
-  //}
 }
-
-
 // We can also access values by their key
 //int[] val = hare_rules.get(1);
 //println("1 is " + val[0]);
