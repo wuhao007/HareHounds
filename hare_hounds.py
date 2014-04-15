@@ -5,12 +5,26 @@
 #   d-o-o
 # 
 #
-#     1-4-7   
-#    /|\|/|\
-#   0-2-5-8-10
-#    \|/|\|/
-#     3-6-9   
+#   1-4-7   
+#  /|\|/|\
+# 0-2-5-8-10
+#  \|/|\|/
+#   3-6-9   
 # 
+
+import simplegui
+
+def draw_handler(canvas):
+    width = image.get_width()
+    height = image.get_height()
+    canvas.draw_image(image, (width / 2, height / 2), (width, height), (width / 2, height / 2), (width, height))
+
+image = simplegui.load_image('http://upload.wikimedia.org/wikipedia/commons/8/85/Hare_and_Hounds_board.png')
+
+frame = simplegui.create_frame('Testing', image.get_width(), image.get_height())
+frame.set_draw_handler(draw_handler)
+frame.start()
+
 rules = { 
 ( 0,True):(1,2,3),
 ( 1,True):(0,2,4,5),
@@ -35,6 +49,7 @@ rules = {
 ( 9,False):(8,10),
 (10,False):(),
 }
+
 def print_board(hare, hounds):
     positions = ['o']*11 
     positions[hare] = 'r'
@@ -106,7 +121,7 @@ def simulate(hare, hounds, turn):
 
 def score_simulate(hare, hounds, turn = False):
     score = [0, 0]
-    for i in range(10000):
+    for i in range(100):
         if simulate(hare, hounds, turn):
             score[0] += 1
         else:
@@ -153,9 +168,10 @@ def play():
             else:
                 print '======hounds======'
                 hound = int(raw_input('choose hound: ' + str(hounds) + ': '))
-                while hound not in hounds:
-                    hound = int(raw_input('choose hound: ' + str(hounds) + ': '))
                 positions = hound_positions(hare, hounds, hound)
+                while (hound not in hounds) or positions == []:
+                    hound = int(raw_input('choose hound: ' + str(hounds) + ': '))
+                    positions = hound_positions(hare, hounds, hound)
                 position = int(raw_input('choose position: ' + str(positions) + ': '))
                 while position not in positions:
                     position = int(raw_input('choose position: ' + str(positions) + ': '))
@@ -184,6 +200,5 @@ def play():
         winer = who_win(hare, hounds)
         if winer != None:
             return winer
-
 
 play()
