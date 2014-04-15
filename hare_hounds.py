@@ -10,7 +10,6 @@
 # 0-2-5-8-10
 #  \|/|\|/
 #   3-6-9   
-# 
 
 import simplegui
 
@@ -127,7 +126,6 @@ def score_simulate(hare, hounds, turn = False):
         else:
             score[1] += 1
     return score
-
 
 def play():
     hare = 10
