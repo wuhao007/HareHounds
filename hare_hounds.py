@@ -47,28 +47,19 @@ def print_board(hare, hounds):
     print '  ' + positions[3] + '-' + positions[6] + '-' + positions[9]
     print 
 
-def choose_move(moves):
-    if moves != []:
-        return random.choice(moves)
-    else:
-        return None
-
 def hare_positions(hare, hounds):
     return [position for position in rules[(hare, True)] if position not in hounds]
 
+def hound_positions(hare, hounds, hound):
+    return [position for position in rules[(hound, False)] if (position not in hounds) and (position != hare)]
+
 def hounds_positions(hare, hounds):
-    #hounds_moves = [[position for position in rules[(hound, False)] if position != hare] for hound in hounds]
     moves = []
     for i in range(len(hounds)):
-        for hound_move in rules[(hounds[i], False)]:
-            if (hound_move != hare) and (hound_move not in hounds):
-                hounds_move = hounds[:]
-                hounds_move[i] = hound_move
-                moves += [hounds_move]
-    #print 'S================================================='
-    #for move in moves:
-    #    print_board(hare, move)
-    #print 'E================================================='
+        for hound_move in hound_positions(hare, hounds, hounds[i]):
+            hounds_move = hounds[:]
+            hounds_move[i] = hound_move
+            moves += [hounds_move]
     return moves
         
 def who_win(hare, hounds):
@@ -127,31 +118,42 @@ def play():
     hare = 10
     hounds = [0, 1, 3]
 
-    computer = True
-    you = False
-    if raw_input('choose sides: ') == 'hare':
-        you = True
-        computer = False
+    you = raw_input('choose sides hare or hounds: ')
+    while True:
+        if you == 'hare':
+            you = True
+            break
+        elif you == 'hounds':
+            you = False
+            break
+        you = raw_input('choose sides hare or hounds: ')
 
-    turn = False
-    if raw_input('turn: ') == 'true':
-        turn = True
+    turn = raw_input('first? yes or no: ')
+    while True:
+        if turn == 'yes':
+            turn = True
+            break
+        elif turn == 'no':
+            turn = False
+            break
+        turn = raw_input('first? yes or no: ')
+        
 
     print_board(hare, hounds)
     while True:
         if turn:
             if you:
                 print '======hare======'
-                hare = int(raw_input('choose position: '))
+                hare = int(raw_input('choose position: ' + str(hare_positions(hare, hounds)) + ': '))
                 print_board(hare, hounds)
             else:
                 print '======hounds======'
-                hound = int(raw_input('choose hound: '))
-                hounds[hounds.index(hound)] = int(raw_input('choose position: '))
+                hound = int(raw_input('choose hound: ' + str(hounds) + ': '))
+                hounds[hounds.index(hound)] = int(raw_input('choose position: ' + str(hound_positions(hare, hounds, hound)) + ': '))
                 print_board(hare, hounds)
             turn = False
         else:
-            if computer:
+            if not you:
                 print '=====hare====='
                 move_score = {}
                 for move in hare_positions(hare, hounds):
