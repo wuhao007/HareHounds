@@ -6,12 +6,13 @@ HashMap<Integer, IntList> hound_rules;
 IntList xlist, ylist;
 
 int hare;
+int hound_index;
 IntList hounds;
 boolean you;
 boolean turn;
 PImage img_grid, img_hare, img_hound;
-float radius;
-boolean move_hare;
+int radius;
+boolean move_hare, move_hound;
 
 void setup() {
   you = false;
@@ -48,14 +49,15 @@ void setup() {
   img_grid = loadImage("grid.png");
   img_hare = loadImage("hare.png");
   img_hound = loadImage("hound.png");
-  
+
   radius = (img_hare.height + img_hare.width + img_hound.height + img_hound.width)/8;
   xlist = new IntList(Arrays.asList(57, 192, 192, 192, 327, 327, 327, 462, 462, 462, 597));
   ylist = new IntList(Arrays.asList(172, 52, 172, 292, 52, 172, 292, 52, 172, 292, 172));
 
   size(img_grid.width, img_grid.height);
- 
+
   move_hare = false;
+  move_hound = false;
 }
 
 void draw() {
@@ -70,48 +72,65 @@ void draw() {
   image(img_hare, img_grid.width-img_hare.width, img_grid.height-img_hare.height);
 }
 
-void mousePressed() {
-  float disX;
-  float disY;
-
+void mousePressed() 
+{
   if (move_hare)
   {
+    IntList hare_moves = hare_rules.get(hare);
     for (int i = 0; i < xlist.size(); i++)
     {
-      disX = xlist.get(i) - mouseX;
-      disY = ylist.get(i) - mouseY;
-      if (hare_rules.get(hare).hasValue(i) && !hounds.hasValue(i) && (sqrt(sq(disX) + sq(disY)) < radius)) {
+      if (hare_moves.hasValue(i) && !hounds.hasValue(i) && overCircle(xlist.get(i), ylist.get(i))) {
         hare = i;
         move_hare = false;
         return;
       }
     }
   }
+  else if (move_hound)
+  {
+    IntList hound_moves = hound_rules.get(hounds.get(hound_index));
+    for (int i = 0; i < xlist.size(); i++)
+    {
+      if (hound_moves.hasValue(i) && !hounds.hasValue(i) && i != hare && overCircle(xlist.get(i), ylist.get(i))) {
+        hounds.set(hound_index, i);
+        move_hound = false;
+        return;
+      }
+    }
+  }
   else
   {
-    disX = radius - mouseX;
-    disY = img_grid.height - radius - mouseY;
-    if (sqrt(sq(disX) + sq(disY)) < radius) {
+    if (overCircle(radius, img_grid.height - radius)) {
       you = false;
       println("choose hounds");
       return;
     }
 
-    disX = img_grid.width - radius - mouseX;
-    disY = img_grid.height - radius - mouseY;
-    if (sqrt(sq(disX) + sq(disY)) < radius) {
+    if (overCircle(img_grid.width - radius, img_grid.height - radius)) {
       you = true;
       println("choose hare");
       return;
     } 
 
-    disX = xlist.get(hare) - mouseX;
-    disY = ylist.get(hare) - mouseY;
-    if (sqrt(sq(disX) + sq(disY)) < radius) {
+    if (overCircle(xlist.get(hare), ylist.get(hare))) {
       println("move hare");
       move_hare = true;
       return;
     }
+    for (int i = 0; i < hounds.size(); i++)
+    {
+      int hound = hounds.get(i);
+      if (overCircle(xlist.get(hound), ylist.get(hound))) {
+        println("move hound");
+        move_hound = true;
+        hound_index = i;
+        return;
+      }
+    }
   }
 }
 
+boolean overCircle(int x, int y)
+{
+  return sqrt(sq(x - mouseX) + sq(y - mouseY)) < radius;
+}
