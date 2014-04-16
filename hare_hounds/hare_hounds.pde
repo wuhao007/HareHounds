@@ -86,42 +86,58 @@ void mousePressed()
       }
     }
   }
-  else if (move_hound)
+
+  if (move_hound)
   {
     IntList hound_moves = hound_rules.get(hounds.get(hound_index));
+    println(hound_moves);
     for (int i = 0; i < xlist.size(); i++)
     {
-      if (hound_moves.hasValue(i) && !hounds.hasValue(i) && i != hare && overCircle(xlist.get(i), ylist.get(i))) {
-        hounds.set(hound_index, i);
-        move_hound = false;
-        return;
+      if (hound_moves.hasValue(i) && i != hare && overCircle(xlist.get(i), ylist.get(i))) 
+      {
+        if (hounds.hasValue(i))
+        {
+          println("move hound", i);
+          move_hound = true;
+          return;
+        }
+        else
+        {
+          hounds.set(hound_index, i);
+          move_hound = false;
+          return;
+        }
       }
     }
   }
-  else
+
+  if (overCircle(radius, img_grid.height - radius)) {
+    you = false;
+    println("choose hounds");
+    return;
+  }
+
+  if (overCircle(img_grid.width - radius, img_grid.height - radius)) {
+    you = true;
+    println("choose hare");
+    return;
+  } 
+
+  if (you)
   {
-    if (overCircle(radius, img_grid.height - radius)) {
-      you = false;
-      println("choose hounds");
-      return;
-    }
-
-    if (overCircle(img_grid.width - radius, img_grid.height - radius)) {
-      you = true;
-      println("choose hare");
-      return;
-    } 
-
     if (overCircle(xlist.get(hare), ylist.get(hare))) {
       println("move hare");
       move_hare = true;
       return;
     }
+  }
+  else
+  {
     for (int i = 0; i < hounds.size(); i++)
     {
       int hound = hounds.get(i);
       if (overCircle(xlist.get(hound), ylist.get(hound))) {
-        println("move hound");
+        println("move hound", i);
         move_hound = true;
         hound_index = i;
         return;
@@ -134,3 +150,4 @@ boolean overCircle(int x, int y)
 {
   return sqrt(sq(x - mouseX) + sq(y - mouseY)) < radius;
 }
+
