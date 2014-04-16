@@ -11,18 +11,18 @@
 #  \|/|\|/
 #   3-6-9   
 
-import simplegui
-
-def draw_handler(canvas):
-    width = image.get_width()
-    height = image.get_height()
-    canvas.draw_image(image, (width / 2, height / 2), (width, height), (width / 2, height / 2), (width, height))
-
-image = simplegui.load_image('http://upload.wikimedia.org/wikipedia/commons/8/85/Hare_and_Hounds_board.png')
-
-frame = simplegui.create_frame('Testing', image.get_width(), image.get_height())
-frame.set_draw_handler(draw_handler)
-frame.start()
+#import simplegui
+#
+#def draw_handler(canvas):
+#    width = image.get_width()
+#    height = image.get_height()
+#    canvas.draw_image(image, (width / 2, height / 2), (width, height), (width / 2, height / 2), (width, height))
+#
+#image = simplegui.load_image('http://upload.wikimedia.org/wikipedia/commons/8/85/Hare_and_Hounds_board.png')
+#
+#frame = simplegui.create_frame('Testing', image.get_width(), image.get_height())
+#frame.set_draw_handler(draw_handler)
+#frame.start()
 
 rules = { 
 ( 0,True):(1,2,3),
@@ -120,7 +120,7 @@ def simulate(hare, hounds, turn):
 
 def score_simulate(hare, hounds, turn = False):
     score = [0, 0]
-    for i in range(100):
+    for i in range(1000):
         if simulate(hare, hounds, turn):
             score[0] += 1
         else:
