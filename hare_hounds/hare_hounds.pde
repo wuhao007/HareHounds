@@ -17,9 +17,9 @@ boolean move_hare, move_hound;
 void setup() {
   you = false;
   turn = true;
-  hare = 10;
+  
+  default_setting();
 
-  hounds = new IntList(Arrays.asList(0, 1, 3));
   hare_rules = new HashMap<Integer, IntList>();
   hare_rules.put(0, new IntList(Arrays.asList(1, 2, 3)));
   hare_rules.put(1, new IntList(Arrays.asList(0, 2, 4, 5)));
@@ -56,8 +56,6 @@ void setup() {
 
   size(img_grid.width, img_grid.height);
 
-  move_hare = false;
-  move_hound = false;
 }
 
 void draw() {
@@ -81,7 +79,7 @@ void mousePressed()
       move_hare = true;
       return;
     }
-    
+
     if (move_hare)
     {
       IntList hare_moves = hare_rules.get(hare);
@@ -107,7 +105,7 @@ void mousePressed()
         return;
       }
     }
-    
+
     if (move_hound)
     {
       IntList hound_moves = hound_rules.get(hounds.get(hound_index));
@@ -124,17 +122,27 @@ void mousePressed()
     }
   }
 
-  if (overCircle(radius, img_grid.height - radius)) {
+  if (you && overCircle(radius, img_grid.height - radius)) {
     you = false;
+    default_setting();
     println("choose hounds");
     return;
   }
 
-  if (overCircle(img_grid.width - radius, img_grid.height - radius)) {
+  if (!you && overCircle(img_grid.width - radius, img_grid.height - radius)) {
     you = true;
+    default_setting();
     println("choose hare");
     return;
   }
+}
+
+void default_setting()
+{
+  hare = 10;
+  hounds = new IntList(Arrays.asList(0, 1, 3));
+  move_hare = false;
+  move_hound = false;
 }
 
 boolean overCircle(int x, int y)
