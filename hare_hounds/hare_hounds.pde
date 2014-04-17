@@ -81,6 +81,19 @@ void mousePressed()
       move_hare = true;
       return;
     }
+    
+    if (move_hare)
+    {
+      IntList hare_moves = hare_rules.get(hare);
+      for (int i = 0; i < xlist.size(); i++)
+      {
+        if (hare_moves.hasValue(i) && !hounds.hasValue(i) && overCircle(xlist.get(i), ylist.get(i))) {
+          hare = i;
+          move_hare = false;
+          return;
+        }
+      }
+    }
   }
   else
   {
@@ -94,32 +107,19 @@ void mousePressed()
         return;
       }
     }
-  }
-
-  if (move_hare)
-  {
-    IntList hare_moves = hare_rules.get(hare);
-    for (int i = 0; i < xlist.size(); i++)
+    
+    if (move_hound)
     {
-      if (hare_moves.hasValue(i) && !hounds.hasValue(i) && overCircle(xlist.get(i), ylist.get(i))) {
-        hare = i;
-        move_hare = false;
-        return;
-      }
-    }
-  }
-
-  if (move_hound)
-  {
-    IntList hound_moves = hound_rules.get(hounds.get(hound_index));
-    println(hound_moves);
-    for (int i = 0; i < xlist.size(); i++)
-    {
-      if (hound_moves.hasValue(i) && i != hare && !hounds.hasValue(i) && overCircle(xlist.get(i), ylist.get(i))) 
+      IntList hound_moves = hound_rules.get(hounds.get(hound_index));
+      println(hound_moves);
+      for (int i = 0; i < xlist.size(); i++)
       {
-        hounds.set(hound_index, i);
-        move_hound = false;
-        return;
+        if (hound_moves.hasValue(i) && i != hare && !hounds.hasValue(i) && overCircle(xlist.get(i), ylist.get(i))) 
+        {
+          hounds.set(hound_index, i);
+          move_hound = false;
+          return;
+        }
       }
     }
   }
