@@ -230,7 +230,7 @@ boolean overCircle(int x, int y)
 {
   return sqrt(sq(x - mouseX) + sq(y - mouseY)) < radius;
 }
-/*
+
 void play()
 {
   if (you_move)
@@ -277,14 +277,15 @@ int playMax(int alpha, int beta, int hare_position, IntList hounds_position)
   }
 }
 
-boolean hare_record_key(int hare_position, IntList hounds_position)
+boolean record_key(HashMap<Integer, HashMap<IntList, Integer>> record, int hare_position, IntList hounds_position)
 {
-  IntList node = new IntList(hounds_position);
-  node.append(hare_position);
+  return record.containsKey(hare_position) && record.get(hare_position).containsKey(hounds_position)
 }
 
-boolean hare_record_value(int hare_position, IntList hounds_position)
+boolean record_value(HashMap<Integer, HashMap<IntList, Integer>> record, int hare_position, IntList hounds_position)
 {
+  value = new HashMap<IntList, Integer>()
+  record.put(hare_position, )
   IntList node = new IntList(hounds_position);
   node.append(hare_position);
 }
@@ -309,7 +310,7 @@ int playMin(int alpha, int beta, int hare, int hounds)
     return score;
   }
 }
-*/
+
 int get_col(int position)
 {
   if (position == 0)
