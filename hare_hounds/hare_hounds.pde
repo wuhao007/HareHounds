@@ -300,7 +300,7 @@ int playMax(int alpha, int beta, int hare_position, IntList hounds_position)
         value = max(value, playMin(alpha, beta, hare_position, move));
         if (value >= beta) 
         {
-          hound_record.put(int_key, value);
+          hounds_record.put(int_key, value);
           return value;
         }
         if (value > alpha) 
@@ -308,7 +308,7 @@ int playMax(int alpha, int beta, int hare_position, IntList hounds_position)
           alpha = value;
         }
       }
-      hound_record.put(int_key, value);
+      hounds_record.put(int_key, value);
       return value;
     }
   }
@@ -319,12 +319,12 @@ int convert_key(int hare_position, IntList hounds_position)
   int int_key = hare_position;
   for (int hound_position : hounds_position)
   {
-    int_key = intKey * 10 + hound_position;
+    int_key = int_key * 11 + hound_position;
   }
   return int_key;
 }
 
-int playMin(int alpha, int beta, int hare, int hounds)
+int playMin(int alpha, int beta, int hare_position, IntList hounds_position)
 {
   int int_key = convert_key(hare_position, hounds_position);
   int winner = who_win(hare_position, hounds_position);
@@ -344,15 +344,15 @@ int playMin(int alpha, int beta, int hare, int hounds)
       int value = -2;
       for (int move : hare_next_positions(hare_position, hounds_position))
       {
-        value = max(value, playMin(alpha, beta, move, hounds_position));
-        if (value >= beta) 
+        value = min(value, playMin(alpha, beta, move, hounds_position));
+        if (value <= alpha) 
         {
           hare_record.put(int_key, value);
           return value;
         }
-        if (value > alpha) 
+        if (value < beta) 
         {
-          alpha = value;
+          beta = value;
         }
       }
       hare_record.put(int_key, value);
@@ -375,18 +375,18 @@ int playMin(int alpha, int beta, int hare, int hounds)
       int value = -2;
       for (IntList move : hounds_next_positions(hare_position, hounds_position))
       {
-        value = max(value, playMin(alpha, beta, hare_position, move));
-        if (value >= beta) 
+        value = min(value, playMin(alpha, beta, hare_position, move));
+        if (value >= alpha) 
         {
-          hound_record.put(int_key, value);
+          hounds_record.put(int_key, value);
           return value;
         }
-        if (value > alpha) 
+        if (value < beta) 
         {
-          alpha = value;
+          beta = value;
         }
       }
-      hound_record.put(int_key, value);
+      hounds_record.put(int_key, value);
       return value;
     }
   }
