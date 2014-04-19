@@ -14,8 +14,8 @@ PImage img_grid, img_hare, img_hound;
 int radius;
 boolean move_hare, move_hound, gameover;
 
-HashMap<Integer, HashMap<IntList, Integer>> hare_record;
-HashMap<Integer, HashMap<IntList, Integer>> hounds_record;
+HashMap<Integer, Integer> hare_record;
+HashMap<Integer, Integer> hounds_record;
 
 void setup() {
   you = false;
@@ -23,8 +23,8 @@ void setup() {
 
   default_setting();
 
-  hare_record = new HashMap<Integer, HashMap<IntList, Integer>>();
-  hounds_record = new HashMap<Integer, HashMap<IntList, Integer>>();
+  hare_record = new HashMap<Integer, Integer>();
+  hounds_record = new HashMap<Integer, Integer>();
 
   hare_rules = new HashMap<Integer, IntList>();
   hare_rules.put(0, new IntList(Arrays.asList(1, 2, 3)));
@@ -248,66 +248,147 @@ void play()
 //[beta, alpha]
 int playMax(int alpha, int beta, int hare_position, IntList hounds_position)
 {
-  if (hare_record_key(hare_position, hounds_position))
+  int int_key = convert_key(hare_position, hounds_position);
+  int winner = who_win(hare_position, hounds_position);
+  if (you)
   {
-    return hare_record_value(hare_position, hounds_position);
-  }
-  else
-  {
-    value = -2;
-    if (you)
+    if (hare_record.containsKey(int_key))
     {
+      return hare_record.get(int_key);
+    }
+    else if (winner != 0)
+    {
+      hare_record.put(int_key, winner);
+      return winner;
+    }
+    else 
+    {
+      int value = -2;
       for (int move : hare_next_positions(hare_position, hounds_position))
       {
         value = max(value, playMin(alpha, beta, move, hounds_position));
-        if (value > beta) 
+        if (value >= beta) 
         {
-          return hare_record_value(hare_position, hounds_position);
+          hare_record.put(int_key, value);
+          return value;
         }
         if (value > alpha) 
         {
           alpha = value;
         }
       }
-      return hare_record_value(hare_position, hounds_position);
+      hare_record.put(int_key, value);
+      return value;
     }
-    else
+  }
+  else
+  {
+    if (hounds_record.containsKey(int_key))
     {
+      return hounds_record.get(int_key);
+    }
+    else if (winner != 0)
+    {
+      hounds_record.put(int_key, winner);
+      return winner;
+    }
+    else 
+    {
+      int value = -2;
+      for (IntList move : hounds_next_positions(hare_position, hounds_position))
+      {
+        value = max(value, playMin(alpha, beta, hare_position, move));
+        if (value >= beta) 
+        {
+          hound_record.put(int_key, value);
+          return value;
+        }
+        if (value > alpha) 
+        {
+          alpha = value;
+        }
+      }
+      hound_record.put(int_key, value);
+      return value;
     }
   }
 }
 
-boolean record_key(HashMap<Integer, HashMap<IntList, Integer>> record, int hare_position, IntList hounds_position)
+int convert_key(int hare_position, IntList hounds_position)
 {
-  return record.containsKey(hare_position) && record.get(hare_position).containsKey(hounds_position)
-}
-
-boolean record_value(HashMap<Integer, HashMap<IntList, Integer>> record, int hare_position, IntList hounds_position)
-{
-  value = new HashMap<IntList, Integer>()
-  record.put(hare_position, )
-  IntList node = new IntList(hounds_position);
-  node.append(hare_position);
+  int int_key = hare_position;
+  for (int hound_position : hounds_position)
+  {
+    int_key = intKey * 10 + hound_position;
+  }
+  return int_key;
 }
 
 int playMin(int alpha, int beta, int hare, int hounds)
 {
-  int score = who_win();
-  if (score == 0)
-  { 
-    int value = 2;
-    var children = successors(node);
-    for (var i = 0; i <children.length; i++) {
-      var child = children[i];
-      value = min(value, playMax(alpha, beta, child));
-      if (value <alpha) return record(node, value);
-      if (value < beta) beta = value;
+  int int_key = convert_key(hare_position, hounds_position);
+  int winner = who_win(hare_position, hounds_position);
+  if (you)
+  {
+    if (hare_record.containsKey(int_key))
+    {
+      return hare_record.get(int_key);
     }
-    return record(node, value);
+    else if (winner != 0)
+    {
+      hare_record.put(int_key, winner);
+      return winner;
+    }
+    else 
+    {
+      int value = -2;
+      for (int move : hare_next_positions(hare_position, hounds_position))
+      {
+        value = max(value, playMin(alpha, beta, move, hounds_position));
+        if (value >= beta) 
+        {
+          hare_record.put(int_key, value);
+          return value;
+        }
+        if (value > alpha) 
+        {
+          alpha = value;
+        }
+      }
+      hare_record.put(int_key, value);
+      return value;
+    }
   }
   else
-  {   
-    return score;
+  {
+    if (hounds_record.containsKey(int_key))
+    {
+      return hounds_record.get(int_key);
+    }
+    else if (winner != 0)
+    {
+      hounds_record.put(int_key, winner);
+      return winner;
+    }
+    else 
+    {
+      int value = -2;
+      for (IntList move : hounds_next_positions(hare_position, hounds_position))
+      {
+        value = max(value, playMin(alpha, beta, hare_position, move));
+        if (value >= beta) 
+        {
+          hound_record.put(int_key, value);
+          return value;
+        }
+        if (value > alpha) 
+        {
+          alpha = value;
+        }
+      }
+      hound_record.put(int_key, value);
+      return value;
+    }
   }
 }
 
@@ -343,15 +424,35 @@ int who_win(int hare_position, IntList hounds_position)
 {
   if (get_col(hare_position) <= get_col(hounds_position.min()))
   {
-    println("=====hare win=====");
     gameover = true;
-    return 1;
+    if (you)
+    {
+      println("=====hare win=====");
+
+      return 1;
+    } 
+    else 
+    {
+      println("=====hound lose=====");
+
+      return -1;
+    }
   }
   else if (hare_next_positions(hare_position, hounds_position).size() <= 0)
   {
-    println("=====hounds win=====");
     gameover = true;
-    return -1;
+    if (you)
+    {
+      println("=====hare lose=====");
+
+      return -1;
+    }
+    else
+    {
+      println("=====hounds win=====");
+
+      return 1;
+    }
   }
   else
   {    
