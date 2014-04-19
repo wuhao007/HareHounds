@@ -14,11 +14,17 @@ PImage img_grid, img_hare, img_hound;
 int radius;
 boolean move_hare, move_hound, gameover;
 
+HashMap<Integer, HashMap<IntList, Integer>> hare_record;
+HashMap<Integer, HashMap<IntList, Integer>> hounds_record;
+
 void setup() {
   you = false;
   you_move = true;
 
   default_setting();
+
+  hare_record = new HashMap<Integer, HashMap<IntList, Integer>>();
+  hounds_record = new HashMap<Integer, HashMap<IntList, Integer>>();
 
   hare_rules = new HashMap<Integer, IntList>();
   hare_rules.put(0, new IntList(Arrays.asList(1, 2, 3)));
@@ -59,7 +65,7 @@ void setup() {
 
 void draw() {
   image(img_grid, 0, 0);
-  if (!gameover && who_win() == 0 && !you_move )
+  if (!gameover && who_win(hare, hounds) == 0 && !you_move )
   {
     if (you)
     {
@@ -71,11 +77,10 @@ void draw() {
        print move_score
        hounds = move_score[max(move_score.keys())]
        */
-      ArrayList<IntList> hounds_moves = hounds_next_positions();
+      ArrayList<IntList> hounds_moves = hounds_next_positions(hare, hounds);
       println(hounds_moves);
       hounds = hounds_moves.get(int(random(hounds_moves.size())));
       println(hounds_moves, hounds);
-      
     }
     else {
       println("=====hare=====");
@@ -86,10 +91,9 @@ void draw() {
        print move_score
        hare = move_score[max(move_score.keys())]
        */
-      IntList hare_moves = hare_next_positions();
+      IntList hare_moves = hare_next_positions(hare, hounds);
       hare = hare_moves.get(int(random(hare_moves.size())));
       println(hare_moves, hare);
-      
     }
     you_move = true;
   }
@@ -105,77 +109,80 @@ void draw() {
 
 void mousePressed() 
 {
-  if (you)
+  if (!gameover)
   {
-    if (overCircle(xlist.get(hare), ylist.get(hare))) {
-      println("move hare");
-      you_move = true;
-      return;
-    }
-
-    if (you_move)
+    if (you)
     {
-      println("=====hare=====");
-      for (int move : hare_next_positions())
-      {
-        if (overCircle(xlist.get(move), ylist.get(move))) {
-          hare = move;
-          you_move = false;
-          return;
-        }
-      }
-    }
 
-    if (overCircle(radius, img_grid.height - radius)) {
-      you = false;
-      you_move = true;
-      default_setting();
-      println("choose hounds");
-      return;
-    }
-  }
-  else
-  {
-    for (int one : hounds)
-    {
-      if (overCircle(xlist.get(one), ylist.get(one))) {
-        println("move hound", one);
+      if (overCircle(xlist.get(hare), ylist.get(hare))) {
+        println("move hare");
         you_move = true;
-        hound = one;
         return;
       }
-    }
 
-    if (you_move)
-    {
-      println("=====hounds=====");
-      for (int move : hound_next_positions(hound))
+      if (you_move)
       {
-        if (overCircle(xlist.get(move), ylist.get(move))) 
+        println("=====hare=====");
+        for (int move : hare_next_positions(hare, hounds))
         {
-          hounds.set(hounds.index(hound), move);
-          you_move = false;
-          return;
+          if (overCircle(xlist.get(move), ylist.get(move))) {
+            hare = move;
+            you_move = false;
+            return;
+          }
         }
       }
     }
+    else
+    {
+      for (int one : hounds)
+      {
+        if (overCircle(xlist.get(one), ylist.get(one))) {
+          println("move hound", one);
+          you_move = true;
+          hound = one;
+          return;
+        }
+      }
 
-    if (overCircle(img_grid.width - radius, img_grid.height - radius)) {
-      you = true;
-      you_move = false;
-      default_setting();
-      println("choose hare");
-      return;
+      if (you_move)
+      {
+        println("=====hounds=====");
+        for (int move : hound_next_positions(hare, hounds, hound))
+        {
+          if (overCircle(xlist.get(move), ylist.get(move))) 
+          {
+            hounds.set(hounds.index(hound), move);
+            you_move = false;
+            return;
+          }
+        }
+      }
     }
+  }
+  if (overCircle(img_grid.width - radius, img_grid.height - radius)) 
+  {
+    you = true;
+    you_move = false;
+    default_setting();
+    println("choose hare");
+    return;
+  }
+  if (overCircle(radius, img_grid.height - radius)) {
+    you = false;
+    you_move = true;
+    default_setting();
+    println("choose hounds");
+    return;
   }
 }
 
-IntList hare_next_positions()
+IntList hare_next_positions(int hare_position, IntList hounds_position)
 {
   IntList moves = new IntList();
-  for (int move : hare_rules.get(hare))
+  for (int move : hare_rules.get(hare_position))
   {
-    if (!hounds.hasValue(move))
+    if (!hounds_position.hasValue(move))
     {
       moves.append(move);
     }
@@ -183,12 +190,12 @@ IntList hare_next_positions()
   return moves;
 }
 
-IntList hound_next_positions(int one)
+IntList hound_next_positions(int hare_position, IntList hounds_position, int one)
 {
   IntList moves = new IntList();
   for (int move : hound_rules.get(one))
   {
-    if (move != hare && !hounds.hasValue(move))
+    if (move != hare_position && !hounds_position.hasValue(move))
     {
       moves.append(move);
     }
@@ -196,14 +203,14 @@ IntList hound_next_positions(int one)
   return moves;
 }
 
-ArrayList<IntList> hounds_next_positions()
+ArrayList<IntList> hounds_next_positions(int hare_position, IntList hounds_position)
 {
   ArrayList<IntList> moves = new ArrayList<IntList>();
-  for (int i = 0; i < hounds.size(); i++)
+  for (int i = 0; i < hounds_position.size(); i++)
   {   
-    for (int move : hound_next_positions(hounds.get(i)))
+    for (int move : hound_next_positions(hare_position, hounds_position, hounds_position.get(i)))
     {
-      IntList hounds_move = new IntList(hounds);
+      IntList hounds_move = new IntList(hounds_position);
       hounds_move.set(i, move);
       moves.add(hounds_move);
     }
@@ -223,53 +230,86 @@ boolean overCircle(int x, int y)
 {
   return sqrt(sq(x - mouseX) + sq(y - mouseY)) < radius;
 }
-
+/*
 void play()
 {
   if (you_move)
   {
-    playMax(-2, 2, 0);
+    playMax(-2, 2, hare, hounds);
   }
   else
   {
-    playMin(-2, 2, 0);
-  } 
+    playMin(-2, 2, hare, hounds);
+  }
 }
 
-int playMax(int alpha, int beta, int node)
+//max beta
+//min alpha
+//[beta, alpha]
+int playMax(int alpha, int beta, int hare_position, IntList hounds_position)
 {
-  /*
-    if(isCutOff(node)) return record(node, evaluation(node));
-    int value = MIN_VALUE;
+  if (hare_record_key(hare_position, hounds_position))
+  {
+    return hare_record_value(hare_position, hounds_position);
+  }
+  else
+  {
+    value = -2;
+    if (you)
+    {
+      for (int move : hare_next_positions(hare_position, hounds_position))
+      {
+        value = max(value, playMin(alpha, beta, move, hounds_position));
+        if (value > beta) 
+        {
+          return hare_record_value(hare_position, hounds_position);
+        }
+        if (value > alpha) 
+        {
+          alpha = value;
+        }
+      }
+      return hare_record_value(hare_position, hounds_position);
+    }
+    else
+    {
+    }
+  }
+}
+
+boolean hare_record_key(int hare_position, IntList hounds_position)
+{
+  IntList node = new IntList(hounds_position);
+  node.append(hare_position);
+}
+
+boolean hare_record_value(int hare_position, IntList hounds_position)
+{
+  IntList node = new IntList(hounds_position);
+  node.append(hare_position);
+}
+
+int playMin(int alpha, int beta, int hare, int hounds)
+{
+  int score = who_win();
+  if (score == 0)
+  { 
+    int value = 2;
     var children = successors(node);
     for (var i = 0; i <children.length; i++) {
-        var child = children[i];
-        value = max(value, playMin(alpha,beta,child));
-        if(value > beta) return record(node, value);
-        if(value > alpha) alpha = value;
+      var child = children[i];
+      value = min(value, playMax(alpha, beta, child));
+      if (value <alpha) return record(node, value);
+      if (value < beta) beta = value;
     }
     return record(node, value);
-    */
-    return 0;
+  }
+  else
+  {   
+    return score;
+  }
 }
-
-int playMin(int alpha, int beta, int node)
-{
-  /*
-    if(isCutOff(node)) return record(node, evaluation(node));
-    int value = MAX_VALUE;
-    var children = successors(node);
-    for (var i = 0; i <children.length; i++) {
-        var child = children[i];
-        value = min(value, playMax(alpha,beta,child));
-        if(value <alpha) return record(node, value);
-        if(value < beta) beta = value;
-    }
-    return record(node, value);
-    */
-    return 0;
-}
-
+*/
 int get_col(int position)
 {
   if (position == 0)
@@ -298,15 +338,15 @@ int get_col(int position)
   }
 }
 
-int who_win()
+int who_win(int hare_position, IntList hounds_position)
 {
-  if (get_col(hare) <= get_col(hounds.min()))
+  if (get_col(hare_position) <= get_col(hounds_position.min()))
   {
     println("=====hare win=====");
     gameover = true;
     return 1;
   }
-  else if (hare_next_positions().size() <= 0)
+  else if (hare_next_positions(hare_position, hounds_position).size() <= 0)
   {
     println("=====hounds win=====");
     gameover = true;
@@ -315,5 +355,6 @@ int who_win()
   else
   {    
     return 0;
-  } 
+  }
 }
+
