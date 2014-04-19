@@ -72,7 +72,9 @@ void draw() {
        hounds = move_score[max(move_score.keys())]
        */
       ArrayList<IntList> hounds_moves = hounds_next_positions();
+      println(hounds_moves);
       hounds = hounds_moves.get(int(random(hounds_moves.size())));
+      println(hounds_moves, hounds);
       println("=====hare=====");
     }
     else {
@@ -86,6 +88,7 @@ void draw() {
        */
       IntList hare_moves = hare_next_positions();
       hare = hare_moves.get(int(random(hare_moves.size())));
+      println(hare_moves, hare);
       println("=====hounds=====");
     }
     you_move = true;
@@ -218,3 +221,48 @@ boolean overCircle(int x, int y)
   return sqrt(sq(x - mouseX) + sq(y - mouseY)) < radius;
 }
 
+void play()
+{
+  if (you_move)
+  {
+    playMax(-2, 2, 0);
+  }
+  else
+  {
+    playMin(-2, 2, 0);
+  } 
+}
+
+int playMax(int alpha, int beta, int node)
+{
+  /*
+    if(isCutOff(node)) return record(node, evaluation(node));
+    int value = MIN_VALUE;
+    var children = successors(node);
+    for (var i = 0; i <children.length; i++) {
+        var child = children[i];
+        value = max(value, playMin(alpha,beta,child));
+        if(value > beta) return record(node, value);
+        if(value > alpha) alpha = value;
+    }
+    return record(node, value);
+    */
+    return 0;
+}
+
+int playMin(int alpha, int beta, int node)
+{
+  /*
+    if(isCutOff(node)) return record(node, evaluation(node));
+    int value = MAX_VALUE;
+    var children = successors(node);
+    for (var i = 0; i <children.length; i++) {
+        var child = children[i];
+        value = min(value, playMax(alpha,beta,child));
+        if(value <alpha) return record(node, value);
+        if(value < beta) beta = value;
+    }
+    return record(node, value);
+    */
+    return 0;
+}
