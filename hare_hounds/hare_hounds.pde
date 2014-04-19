@@ -12,7 +12,7 @@ boolean you;
 boolean you_move;
 PImage img_grid, img_hare, img_hound;
 int radius;
-boolean move_hare, move_hound;
+boolean move_hare, move_hound, gameover;
 
 void setup() {
   you = false;
@@ -59,7 +59,7 @@ void setup() {
 
 void draw() {
   image(img_grid, 0, 0);
-  if (!you_move)
+  if (!gameover && who_win() == 0 && !you_move )
   {
     if (you)
     {
@@ -75,7 +75,7 @@ void draw() {
       println(hounds_moves);
       hounds = hounds_moves.get(int(random(hounds_moves.size())));
       println(hounds_moves, hounds);
-      println("=====hare=====");
+      
     }
     else {
       println("=====hare=====");
@@ -89,7 +89,7 @@ void draw() {
       IntList hare_moves = hare_next_positions();
       hare = hare_moves.get(int(random(hare_moves.size())));
       println(hare_moves, hare);
-      println("=====hounds=====");
+      
     }
     you_move = true;
   }
@@ -115,6 +115,7 @@ void mousePressed()
 
     if (you_move)
     {
+      println("=====hare=====");
       for (int move : hare_next_positions())
       {
         if (overCircle(xlist.get(move), ylist.get(move))) {
@@ -147,6 +148,7 @@ void mousePressed()
 
     if (you_move)
     {
+      println("=====hounds=====");
       for (int move : hound_next_positions(hound))
       {
         if (overCircle(xlist.get(move), ylist.get(move))) 
@@ -214,6 +216,7 @@ void default_setting()
 {
   hare = 10;
   hounds = new IntList(Arrays.asList(0, 1, 3));
+  gameover = false;
 }
 
 boolean overCircle(int x, int y)
@@ -265,4 +268,52 @@ int playMin(int alpha, int beta, int node)
     return record(node, value);
     */
     return 0;
+}
+
+int get_col(int position)
+{
+  if (position == 0)
+  {
+    return 0;
+  }
+  else if (position == 1 || position == 2 || position == 3)
+  {
+    return 1;
+  }
+  else if (position == 4 || position == 5 || position == 6)
+  {
+    return 2;
+  }
+  else if (position == 7 || position == 8 || position == 9)
+  {
+    return 3;
+  }
+  else if (position == 10)
+  {
+    return 4;
+  }
+  else
+  {
+    return -1;
+  }
+}
+
+int who_win()
+{
+  if (get_col(hare) <= get_col(hounds.min()))
+  {
+    println("=====hare win=====");
+    gameover = true;
+    return 1;
+  }
+  else if (hare_next_positions().size() <= 0)
+  {
+    println("=====hounds win=====");
+    gameover = true;
+    return -1;
+  }
+  else
+  {    
+    return 0;
+  } 
 }
