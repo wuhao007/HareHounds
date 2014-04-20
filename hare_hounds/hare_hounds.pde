@@ -1,5 +1,4 @@
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Arrays;
 
 HashMap<Integer, IntList> hare_rules;
@@ -16,7 +15,6 @@ boolean you;
 boolean you_move;
 boolean gameover;
 
-HashSet<Integer> track;
 HashMap<Integer, Integer> hare_value;
 HashMap<Integer, Integer> hare_best_move;
 HashMap<Integer, Integer> hounds_value;
@@ -30,7 +28,6 @@ void setup() {
 
   hare_value = new HashMap<Integer, Integer>();
   hounds_value = new HashMap<Integer, Integer>();
-  track = new HashSet<Integer>();
 
   hare_rules = new HashMap<Integer, IntList>();
   hare_rules.put(0, new IntList(Arrays.asList(1, 2, 3)));
@@ -85,7 +82,9 @@ void draw() {
        */
       ArrayList<IntList> hounds_moves = hounds_next_positions(hare, hounds);
       println(hounds_moves);
-      playMax(-2, 2, hare, hounds);
+      IntList max_stack = new IntList();
+      max_stack.append(convert_key(hare, hounds));
+      playMax(-2, 2, hare, hounds, max_stack, new IntList());
       hounds = hounds_moves.get(int(random(hounds_moves.size())));
       println(hounds_moves, hounds);
     }
@@ -99,7 +98,9 @@ void draw() {
        hare = move_score[max(move_score.keys())]
        */
       IntList hare_moves = hare_next_positions(hare, hounds);
-      playMax(-2, 2, hare, hounds);
+      IntList max_stack = new IntList();
+      max_stack.append(convert_key(hare, hounds));
+      playMax(-2, 2, hare, hounds, max_stack, new IntList());
       hare = hare_moves.get(int(random(hare_moves.size())));
       println(hare_moves, hare);
     }
@@ -243,25 +244,22 @@ void play()
 {
   if (you_move)
   {
-    playMax(-2, 2, hare, hounds);
+    playMax(-2, 2, hare, hounds, new IntList(), new IntList());
   }
   else
   {
-    playMin(-2, 2, hare, hounds);
+    playMin(-2, 2, hare, hounds, new IntList(), new IntList());
   }
 }
 
 //max beta
 //min alpha
 //[beta, alpha]
-int playMax(int alpha, int beta, int hare_position, IntList hounds_position)
+int playMax(int alpha, int beta, int hare_position, IntList hounds_position, IntList max_stack, IntList min_stack)
 {
   int int_key = convert_key(hare_position, hounds_position);
   int winner = who_win(hare_position, hounds_position);
-  if (!track.contains(int_key))
-  {
-    track.add(int_key);
-  }
+
   println(hare_position, hounds_position, alpha, beta);
   if (you)
   {
@@ -279,11 +277,19 @@ int playMax(int alpha, int beta, int hare_position, IntList hounds_position)
       int value = -2;
       for (int move : hare_next_positions(hare_position, hounds_position))
       {
-        if (track.contains(convert_key(move, hounds_position)))
+        int child = convert_key(move, hounds_position);
+        if (max_stack.hasValue(child))
         {
           continue;
         }
-        value = max(value, playMin(alpha, beta, move, hounds_position));
+        max_stack.append(child);
+        int one_step_value = playMin(alpha, beta, move, hounds_position, max_stack, min_stack);
+        
+        if (value < one_step_value)
+        {
+          value = one_step_value;
+          //hare_best_move.put(int_key, move);
+        }
         if (value >= beta) 
         {
           hare_value.put(int_key, value);
@@ -292,6 +298,10 @@ int playMax(int alpha, int beta, int hare_position, IntList hounds_position)
         if (value > alpha) 
         {
           alpha = value;
+        }
+        if (value == 1)
+        {
+          return value;
         }
       }
       hare_value.put(int_key, value);
@@ -314,11 +324,18 @@ int playMax(int alpha, int beta, int hare_position, IntList hounds_position)
       int value = -2;
       for (IntList move : hounds_next_positions(hare_position, hounds_position))
       {
-        if (track.contains(convert_key(hare_position, move)))
+        int child = convert_key(hare_position, move);
+        if (max_stack.hasValue(child))
         {
           continue;
         }
-        value = max(value, playMin(alpha, beta, hare_position, move));
+        max_stack.append(child);
+        int one_step_value = playMin(alpha, beta, hare_position, move, max_stack, min_stack);
+        if (value < one_step_value)
+        {
+          value = one_step_value;
+          //hounds_best_move.put(int_key, move);
+        }
         if (value >= beta) 
         {
           hounds_value.put(int_key, value);
@@ -327,6 +344,10 @@ int playMax(int alpha, int beta, int hare_position, IntList hounds_position)
         if (value > alpha) 
         {
           alpha = value;
+        }
+        if (value == 1)
+        {
+          return value;
         }
       }
       hounds_value.put(int_key, value);
@@ -345,14 +366,11 @@ int convert_key(int hare_position, IntList hounds_position)
   return int_key;
 }
 
-int playMin(int alpha, int beta, int hare_position, IntList hounds_position)
+int playMin(int alpha, int beta, int hare_position, IntList hounds_position, IntList max_stack, IntList min_stack)
 {
   int int_key = convert_key(hare_position, hounds_position);
   int winner = who_win(hare_position, hounds_position);
-  if (!track.contains(int_key))
-  {
-    track.add(int_key);
-  }
+
   println(hare_position, hounds_position, alpha, beta);
   if (you)
   {
@@ -370,11 +388,18 @@ int playMin(int alpha, int beta, int hare_position, IntList hounds_position)
       int value = 2;
       for (int move : hare_next_positions(hare_position, hounds_position))
       {
-        if (track.contains(convert_key(move, hounds_position)))
+        int child = convert_key(move, hounds_position);
+        if (min_stack.hasValue(child))
         {
           continue;
         }
-        value = min(value, playMin(alpha, beta, move, hounds_position));
+        min_stack.append(child);
+        int one_step_value = playMax(alpha, beta, move, hounds_position, max_stack, min_stack);
+        if (value > one_step_value)
+        {
+          value = one_step_value;
+          //hare_best_move.put(int_key, move);
+        }
         if (value <= alpha) 
         {
           hare_value.put(int_key, value);
@@ -383,6 +408,10 @@ int playMin(int alpha, int beta, int hare_position, IntList hounds_position)
         if (value < beta) 
         {
           beta = value;
+        }
+        if (value == -1)
+        {
+          return value;
         }
       }
       hare_value.put(int_key, value);
@@ -405,11 +434,18 @@ int playMin(int alpha, int beta, int hare_position, IntList hounds_position)
       int value = 2;
       for (IntList move : hounds_next_positions(hare_position, hounds_position))
       {
-        if (track.contains(convert_key(hare_position, move)))
+        int child = convert_key(hare_position, move);
+        if (min_stack.hasValue(child))
         {
           continue;
         }
-        value = min(value, playMin(alpha, beta, hare_position, move));
+        min_stack.append(child);
+        int one_step_value = playMax(alpha, beta, hare_position, move, max_stack, min_stack);
+        if (value > one_step_value)
+        {
+          value = one_step_value;
+          //hounds_best_move.put(int_key, move);
+        }
         if (value >= alpha) 
         {
           hounds_value.put(int_key, value);
@@ -418,6 +454,10 @@ int playMin(int alpha, int beta, int hare_position, IntList hounds_position)
         if (value < beta) 
         {
           beta = value;
+        }
+        if (value == -1)
+        {
+          return value;
         }
       }
       hounds_value.put(int_key, value);
