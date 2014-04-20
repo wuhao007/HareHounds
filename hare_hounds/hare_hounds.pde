@@ -338,7 +338,6 @@ int playMax(int alpha, int beta, int hare_position, IntList hounds_position, Int
         }
         max_stack.append(child);
         int one_step_value = playMin(alpha, beta, move, hounds_position, max_stack, min_stack);
-
         if (value < one_step_value)
         {
           value = one_step_value;
@@ -507,7 +506,7 @@ int who_win(int hare_position, IntList hounds_position)
   if (get_col(hare_position) <= get_col(hounds_position.min()))
   {
     println("=====hare win=====");
-    gameover = true;
+    //gameover = true;
     if (you)
     {
       println("=====you win=====");
@@ -522,7 +521,7 @@ int who_win(int hare_position, IntList hounds_position)
   else if (hare_next_positions(hare_position, hounds_position).size() <= 0)
   {
     println("=====hounds win=====");
-    gameover = true;
+    //gameover = true;
     if (you)
     {
       println("=====computer win=====");
