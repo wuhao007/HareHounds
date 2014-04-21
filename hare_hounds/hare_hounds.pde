@@ -539,7 +539,7 @@ boolean gameover()
     println("=====you win=====");
     return true;
   }
-  else if (result == -1)
+  else if (result == 1)
   {
     println("=====computer win=====");
     return true;
