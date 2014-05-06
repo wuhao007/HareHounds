@@ -309,11 +309,12 @@ int playMax(int alpha, int beta, int hare_position, IntList hounds_position, int
       {
         alpha = value;
       }
-      
+      /*
       if (value == 1)
       {
         return value;
       }
+      */
       
     }
     return value;
@@ -394,11 +395,12 @@ int playMin(int alpha, int beta, int hare_position, IntList hounds_position, int
       {
         beta = value;
       }
-      
+      /*
       if (value == -1)
       {
         return value;
       }
+      */
     }
     return value;
   }
