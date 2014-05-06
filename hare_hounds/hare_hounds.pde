@@ -13,6 +13,7 @@ int depth;
 
 boolean you;
 boolean you_move;
+boolean stop;
 
 //HashMap<Integer, Integer> hare_best_move;
 int hare_best_move;
@@ -26,8 +27,10 @@ PrintWriter output;
 void setup() {
   you = false;
   you_move = true;
+  stop = false;
   output = createWriter("positions.txt"); 
 
+  hounds = new IntList(Arrays.asList(0, 1, 3));
   default_setting();
   //hare_best_move = new HashMap<Integer, Integer>();
   //hounds_best_move = new HashMap<Integer, IntList>();
@@ -73,7 +76,11 @@ void setup() {
 
 void draw() {
   image(img_grid, 0, 0);
-  if (!gameover() && !you_move )
+  if (!stop)
+  { 
+    gameover();
+  } 
+  if (!stop && !you_move )
   {
     if (you)
     {
@@ -120,7 +127,7 @@ void draw() {
 
 void mousePressed() 
 {
-  if (!gameover())
+  if (!stop)
   {
     if (you)
     {
@@ -181,6 +188,7 @@ void mousePressed()
   {
     you = true;
     you_move = false;
+    stop = false;
     default_setting();
     println("=====choose hare side=====");
     return;
@@ -188,6 +196,7 @@ void mousePressed()
   if (overCircle(radius, img_grid.height - radius)) {
     you = false;
     you_move = true;
+    stop = false;
     default_setting();
     println("=====choose hounds side=====");
     return;
@@ -239,7 +248,10 @@ ArrayList<IntList> hounds_next_positions(int hare_position, IntList hounds_posit
 void default_setting()
 {
   hare = 10;
-  hounds = new IntList(Arrays.asList(0, 1, 3));
+  hounds.set(0, 0);
+  hounds.set(1, 1);
+  hounds.set(2, 3);
+  total_hounds_countdown = 10;
 }
 
 boolean overCircle(int x, int y)
@@ -533,22 +545,22 @@ int who_win(int hare_position, IntList hounds_position, int hounds_countdown)
   }
 }
 
-boolean gameover()
+void gameover()
 {
   int result = who_win(hare, hounds, total_hounds_countdown);
   if (result == -1)
   {
     println("=====you win=====");
-    return true;
+    stop = true;
   }
   else if (result == 1)
   {
     println("=====computer win=====");
-    return true;
+    stop = true;
   }
   else
   {    
-    return false;
+    stop = false;
   }
 }
 
