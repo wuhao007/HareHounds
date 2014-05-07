@@ -22,13 +22,13 @@ int hound_best_index;
 int hound_best_move;
 int total_hounds_countdown;
 int total_depth;
-PrintWriter output;
+//PrintWriter output;
 
 void setup() {
   you = false;
   you_move = true;
   stop = false;
-  output = createWriter("positions.txt"); 
+  //output = createWriter("positions.txt"); 
   total_depth = 10;
 
   hounds = new IntList(Arrays.asList(0, 1, 3));
@@ -283,15 +283,19 @@ int eval_fn(int winner)
 
 int playMax(int alpha, int beta, int hare_position, IntList hounds_position, int hounds_countdown, int depth)
 {
-  int int_key = convert_key(hare_position, hounds_position);
   int winner = who_win(hare_position, hounds_position, hounds_countdown);
-  output.println("max depth " + depth + " position: " + hare_position + " " + hounds_position + " winner:" + winner);
-  if (cutoff_test(winner, depth))
+  //output.println("max depth " + depth + " position: " + hare_position + " " + hounds_position + " winner:" + winner);
+  if (winner != 0)
+  {
+    return winner;
+  }
+  else if (depth > total_depth)
   {
     return eval_fn(winner);
   }
   
   //println("max ", hare_position, hounds_position, alpha, beta);
+  int int_key = convert_key(hare_position, hounds_position);
   int value = -2;
   if (you)
   {
@@ -379,14 +383,18 @@ int convert_key(int hare_position, IntList hounds_position)
 
 int playMin(int alpha, int beta, int hare_position, IntList hounds_position, int hounds_countdown, int depth)
 {
-  int int_key = convert_key(hare_position, hounds_position);
   int winner = who_win(hare_position, hounds_position, hounds_countdown);
-  output.println("min depth " + depth + " position: " + hare_position + " " + hounds_position + " winner:" + winner);
-  if (cutoff_test(winner, depth))
+  //output.println("min depth " + depth + " position: " + hare_position + " " + hounds_position + " winner:" + winner);
+  if (winner != 0)
+  {
+    return winner;
+  }
+  else if (depth > total_depth)
   {
     return eval_fn(winner);
   }
-
+  
+  int int_key = convert_key(hare_position, hounds_position);
   int value = 2;
   //println("min ", hare_position, hounds_position, alpha, beta);
   if (you)
