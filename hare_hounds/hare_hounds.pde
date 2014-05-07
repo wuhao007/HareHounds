@@ -29,6 +29,7 @@ void setup() {
   you_move = true;
   stop = false;
   output = createWriter("positions.txt"); 
+  total_depth = 10;
 
   hounds = new IntList(Arrays.asList(0, 1, 3));
   default_setting();
@@ -264,8 +265,9 @@ boolean overCircle(int x, int y)
 //[beta, alpha]
 boolean cutoff_test(int winner, int depth)
 {
-  if (winner != 0 || depth > 10)
+  if (winner != 0 || depth > total_depth)
   {
+    println("depth is ", depth);
     return true;
   }
   else
@@ -564,3 +566,23 @@ void gameover()
   }
 }
 
+void keyPressed() 
+{
+  if (key == CODED) 
+  {
+    if (keyCode == UP) 
+    {
+      total_depth++;
+      println(total_depth);  
+    } 
+    else if (keyCode == DOWN) 
+    {
+      total_depth--;
+      println(total_depth);    
+    } 
+  } 
+  else 
+  {
+    println("not code");
+  }
+}
