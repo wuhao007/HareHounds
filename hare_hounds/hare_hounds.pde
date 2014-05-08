@@ -1,5 +1,6 @@
 import java.util.Map;
 import java.util.Arrays;
+import java.util.Random;
 
 HashMap<Integer, IntList> hare_rules;
 HashMap<Integer, IntList> hound_rules;
@@ -23,11 +24,13 @@ int hound_best_move;
 int total_hounds_countdown;
 int total_depth;
 //PrintWriter output;
+Random random;
 
 void setup() {
   you = false;
   you_move = true;
   stop = false;
+  random = new Random();
   //output = createWriter("positions.txt"); 
   total_depth = 10;
 
@@ -171,7 +174,7 @@ void mousePressed()
         {
           if (overCircle(xlist.get(move), ylist.get(move))) 
           {
-            
+
             if (get_col(hound) == get_col(move))
             {
               total_hounds_countdown--;
@@ -263,25 +266,74 @@ boolean overCircle(int x, int y)
 //max beta
 //min alpha
 //[beta, alpha]
+/*
 boolean cutoff_test(int winner, int depth)
+ {
+ if (winner != 0 || depth > total_depth)
+ {
+ println("depth is ", depth);
+ return true;
+ }
+ else
+ {
+ return false;
+ }
+ }
+ */
+
+int simulate(int hare_position, IntList hounds_position, int hounds_countdown, boolean side)
 {
-  if (winner != 0 || depth > total_depth)
+  int winner = who_win(hare_position, hounds_position, hounds_countdown);
+  if (winner != 0) 
   {
-    println("depth is ", depth);
-    return true;
+    return winner;
+  }
+  
+  if (side)
+  {
+    println("=====hare=====");
+    //println(hare, hounds, " to draw");
+    //IntList hare_moves = hare_next_positions(hare, hounds);
+    IntList hare_choose_positions = hare_next_positions(hare_position, hounds_position);
+    int hare_choose_position = hare_choose_positions.get(random.nextInt(hare_choose_positions.size()));
+    return simulate(hare_choose_position, hounds_position, hounds_countdown, !side);
+    //println("hare best move", hare_best_move);
+    //hare = hare_moves.get(int(random(hare_moves.size())));
+    //hare = hare_best_move.get(int_key);
+    //hare = hare_best_move;
+    //println(hare_moves, hare);
   }
   else
   {
-    return false;
+    println("=====hounds=====");
+    //println(hare, hounds, " to draw");
+    //ArrayList<IntList> hounds_moves = hounds_next_positions(hare, hounds);
+    //println(hounds_moves);
+
+    ArrayList<IntList> hounds_choose_positions = hounds_next_positions(hare_position, hounds_position);
+    IntList hounds_choose_position = hounds_choose_positions.get(random.nextInt(hounds_choose_positions.size()));
+     
+    //hounds = hounds_moves.get(int(random(hounds_moves.size())));
+    //hounds = hounds_best_move.get(int_key)
+    if (same_col(hounds_position, hounds_choose_position))
+    {
+      return simulate(hare_position, hounds_choose_position, hounds_countdown - 1, !side);
+    }
+    else
+    {
+      return simulate(hare_position, hounds_choose_position, hounds_countdown, !side);
+    }
+    //hounds.set(hound_best_index, hound_best_move);
+    //println(hounds_moves, hounds);
   }
 }
 
-int eval_fn(int winner)
+double eval_fn(int hare_position, IntList hounds_position, int hounds_countdown, int winner)
 {
   return winner;
 }
 
-int playMax(int alpha, int beta, int hare_position, IntList hounds_position, int hounds_countdown, int depth)
+double playMax(double alpha, double beta, int hare_position, IntList hounds_position, int hounds_countdown, int depth)
 {
   int winner = who_win(hare_position, hounds_position, hounds_countdown);
   //output.println("max depth " + depth + " position: " + hare_position + " " + hounds_position + " winner:" + winner);
@@ -291,12 +343,12 @@ int playMax(int alpha, int beta, int hare_position, IntList hounds_position, int
   }
   else if (depth > total_depth)
   {
-    return eval_fn(winner);
+    return eval_fn(hare_position, hounds_position, hounds_countdown, winner);
   }
-  
+
   //println("max ", hare_position, hounds_position, alpha, beta);
   int int_key = convert_key(hare_position, hounds_position);
-  int value = -2;
+  double value = -2;
   if (you)
   {
     for (IntList move : hounds_next_positions(hare_position, hounds_position))
@@ -306,7 +358,7 @@ int playMax(int alpha, int beta, int hare_position, IntList hounds_position, int
       {
         countdown--;
       }
-      int one_step_value = playMin(alpha, beta, hare_position, move, countdown, depth + 1);
+      double one_step_value = playMin(alpha, beta, hare_position, move, countdown, depth + 1);
       //println("move:", hare_position, hounds_position, " value:", one_step_value);
       if (value < one_step_value)
       {
@@ -329,11 +381,10 @@ int playMax(int alpha, int beta, int hare_position, IntList hounds_position, int
       }
       /*
       if (value == 1)
-      {
-        return value;
-      }
-      */
-      
+       {
+       return value;
+       }
+       */
     }
     return value;
   }
@@ -341,7 +392,7 @@ int playMax(int alpha, int beta, int hare_position, IntList hounds_position, int
   {
     for (int move : hare_next_positions(hare_position, hounds_position))
     {
-      int one_step_value = playMin(alpha, beta, move, hounds_position, hounds_countdown, depth + 1);
+      double one_step_value = playMin(alpha, beta, move, hounds_position, hounds_countdown, depth + 1);
       //println("move:", hare_position, hounds_position, " value:", one_step_value);
       if (value < one_step_value)
       {
@@ -362,10 +413,10 @@ int playMax(int alpha, int beta, int hare_position, IntList hounds_position, int
       }
       /*
       if (value == 1)
-      {
-        return value;
-      }
-      */
+       {
+       return value;
+       }
+       */
     }
     return value;
   }
@@ -381,7 +432,7 @@ int convert_key(int hare_position, IntList hounds_position)
   return int_key;
 }
 
-int playMin(int alpha, int beta, int hare_position, IntList hounds_position, int hounds_countdown, int depth)
+double playMin(double alpha, double beta, int hare_position, IntList hounds_position, int hounds_countdown, int depth)
 {
   int winner = who_win(hare_position, hounds_position, hounds_countdown);
   //output.println("min depth " + depth + " position: " + hare_position + " " + hounds_position + " winner:" + winner);
@@ -391,17 +442,17 @@ int playMin(int alpha, int beta, int hare_position, IntList hounds_position, int
   }
   else if (depth > total_depth)
   {
-    return eval_fn(winner);
+    return eval_fn(hare_position, hounds_position, hounds_countdown, winner);
   }
-  
+
   int int_key = convert_key(hare_position, hounds_position);
-  int value = 2;
+  double value = 2;
   //println("min ", hare_position, hounds_position, alpha, beta);
   if (you)
   {   
     for (int move : hare_next_positions(hare_position, hounds_position))
     {
-      int one_step_value = playMax(alpha, beta, move, hounds_position, hounds_countdown, depth + 1);
+      double one_step_value = playMax(alpha, beta, move, hounds_position, hounds_countdown, depth + 1);
       //println("move:", hare_position, hounds_position, " value:", one_step_value);
       if (value > one_step_value)
       {
@@ -419,10 +470,10 @@ int playMin(int alpha, int beta, int hare_position, IntList hounds_position, int
       }
       /*
       if (value == -1)
-      {
-        return value;
-      }
-      */
+       {
+       return value;
+       }
+       */
     }
     return value;
   }
@@ -435,7 +486,7 @@ int playMin(int alpha, int beta, int hare_position, IntList hounds_position, int
       {
         countdown--;
       }
-      int one_step_value = playMax(alpha, beta, hare_position, move, countdown, depth + 1);
+      double one_step_value = playMax(alpha, beta, hare_position, move, countdown, depth + 1);
       //println("move:", hare_position, hounds_position, " value:", one_step_value);
       if (value > one_step_value)
       {
@@ -453,10 +504,10 @@ int playMin(int alpha, int beta, int hare_position, IntList hounds_position, int
       }
       /*
       if (value == -1)
-      {
-        return value;
-      }
-      */
+       {
+       return value;
+       }
+       */
     }
     return value;
   }
@@ -581,16 +632,17 @@ void keyPressed()
     if (keyCode == UP) 
     {
       total_depth++;
-      println(total_depth);  
+      println(total_depth);
     } 
     else if (keyCode == DOWN) 
     {
       total_depth--;
-      println(total_depth);    
-    } 
+      println(total_depth);
+    }
   } 
   else 
   {
     println("not code");
   }
 }
+
