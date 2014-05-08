@@ -288,49 +288,41 @@ int simulate(int hare_position, IntList hounds_position, int hounds_countdown, b
   {
     return winner;
   }
-  
-  if (side)
-  {
-    println("=====hare=====");
-    //println(hare, hounds, " to draw");
-    //IntList hare_moves = hare_next_positions(hare, hounds);
-    IntList hare_choose_positions = hare_next_positions(hare_position, hounds_position);
-    int hare_choose_position = hare_choose_positions.get(random.nextInt(hare_choose_positions.size()));
-    return simulate(hare_choose_position, hounds_position, hounds_countdown, !side);
-    //println("hare best move", hare_best_move);
-    //hare = hare_moves.get(int(random(hare_moves.size())));
-    //hare = hare_best_move.get(int_key);
-    //hare = hare_best_move;
-    //println(hare_moves, hare);
-  }
   else
   {
-    println("=====hounds=====");
-    //println(hare, hounds, " to draw");
-    //ArrayList<IntList> hounds_moves = hounds_next_positions(hare, hounds);
-    //println(hounds_moves);
-
-    ArrayList<IntList> hounds_choose_positions = hounds_next_positions(hare_position, hounds_position);
-    IntList hounds_choose_position = hounds_choose_positions.get(random.nextInt(hounds_choose_positions.size()));
-     
-    //hounds = hounds_moves.get(int(random(hounds_moves.size())));
-    //hounds = hounds_best_move.get(int_key)
-    if (same_col(hounds_position, hounds_choose_position))
+    if (side)
     {
-      return simulate(hare_position, hounds_choose_position, hounds_countdown - 1, !side);
+      ArrayList<IntList> hounds_choose_positions = hounds_next_positions(hare_position, hounds_position);
+      IntList hounds_choose_position = hounds_choose_positions.get(random.nextInt(hounds_choose_positions.size()));
+      if (same_col(hounds_position, hounds_choose_position))
+      {
+        return simulate(hare_position, hounds_choose_position, hounds_countdown - 1, !side);
+      }
+      else
+      {
+        return simulate(hare_position, hounds_choose_position, hounds_countdown, !side);
+      }
     }
     else
     {
-      return simulate(hare_position, hounds_choose_position, hounds_countdown, !side);
+      IntList hare_choose_positions = hare_next_positions(hare_position, hounds_position);
+      return simulate(hare_choose_positions.get(random.nextInt(hare_choose_positions.size())), hounds_position, hounds_countdown, !side);
     }
-    //hounds.set(hound_best_index, hound_best_move);
-    //println(hounds_moves, hounds);
   }
 }
 
-double eval_fn(int hare_position, IntList hounds_position, int hounds_countdown, int winner)
+double eval_fn(int hare_position, IntList hounds_position, int hounds_countdown, boolean side)
 {
-  return winner;
+  int computer_side = 0;
+  for (int i = 0; i < 10; i++)
+  {
+    if (simulate(hare_position, hounds_position, hounds_countdown, side) == 1)
+    {
+      computer_side++;
+    }
+  }
+  println(computer_side/10.0);
+  return computer_side/10.0;
 }
 
 double playMax(double alpha, double beta, int hare_position, IntList hounds_position, int hounds_countdown, int depth)
@@ -343,7 +335,7 @@ double playMax(double alpha, double beta, int hare_position, IntList hounds_posi
   }
   else if (depth > total_depth)
   {
-    return eval_fn(hare_position, hounds_position, hounds_countdown, winner);
+    return eval_fn(hare_position, hounds_position, hounds_countdown, you);
   }
 
   //println("max ", hare_position, hounds_position, alpha, beta);
@@ -442,7 +434,7 @@ double playMin(double alpha, double beta, int hare_position, IntList hounds_posi
   }
   else if (depth > total_depth)
   {
-    return eval_fn(hare_position, hounds_position, hounds_countdown, winner);
+    return eval_fn(hare_position, hounds_position, hounds_countdown, !you);
   }
 
   int int_key = convert_key(hare_position, hounds_position);
