@@ -15,6 +15,7 @@ int depth;
 boolean you;
 boolean you_move;
 boolean stop;
+int max_depth, num_nodes, max_pruning, min_pruning;
 
 //HashMap<Integer, Integer> hare_best_move;
 int hare_best_move;
@@ -86,6 +87,10 @@ void draw() {
   } 
   if (!stop && !you_move )
   {
+    max_depth = 0; 
+    num_nodes = 0;
+    max_pruning = 0;
+    min_pruning = 0;
     if (you)
     {
       println("=====hounds=====");
@@ -95,8 +100,8 @@ void draw() {
       playMax(-2, 2, hare, hounds, total_hounds_countdown, 0);
       int a = hounds.get(hound_best_index);
       int b = hound_best_move;
-      println("hounds best", a);
-      println("hounds best move ", b);
+      //println("hounds best", a);
+      //println("hounds best move ", b);
       //hounds = hounds_moves.get(int(random(hounds_moves.size())));
       //hounds = hounds_best_move.get(int_key)
       if (get_col(a) == get_col(b))
@@ -111,13 +116,18 @@ void draw() {
       //println(hare, hounds, " to draw");
       //IntList hare_moves = hare_next_positions(hare, hounds);
       playMax(-2, 2, hare, hounds, total_hounds_countdown, 0);
-      println("hare best move", hare_best_move);
+      //println("hare best move", hare_best_move);
       //hare = hare_moves.get(int(random(hare_moves.size())));
       //hare = hare_best_move.get(int_key);
       hare = hare_best_move;
       //println(hare_moves, hare);
     }
     you_move = true;
+
+    println("maximum depth of game tree ", max_depth);
+    println("total number of nodes generated ", num_nodes);
+    println("number of times pruning occurred within the MAX-VALUE function ", max_pruning);
+    println("number of times pruning occurred within the MIN-VALUE function ", min_pruning);
   }
   image(img_hare, xlist.get(hare) - radius, ylist.get(hare) - radius);
   for (int i : hounds)
@@ -321,12 +331,18 @@ double eval_fn(int hare_position, IntList hounds_position, int hounds_countdown,
       computer_side++;
     }
   }
-  println(computer_side/10.0);
+  //println(computer_side/10.0);
   return computer_side/10.0;
 }
 
 double playMax(double alpha, double beta, int hare_position, IntList hounds_position, int hounds_countdown, int depth)
 {
+  if (max_depth < depth)
+  {
+    max_depth = depth;
+  }
+  num_nodes++;
+    
   int winner = who_win(hare_position, hounds_position, hounds_countdown);
   //output.println("max depth " + depth + " position: " + hare_position + " " + hounds_position + " winner:" + winner);
   if (winner != 0)
@@ -335,6 +351,7 @@ double playMax(double alpha, double beta, int hare_position, IntList hounds_posi
   }
   else if (depth > total_depth)
   {
+    //return 0;
     return eval_fn(hare_position, hounds_position, hounds_countdown, you);
   }
 
@@ -365,6 +382,7 @@ double playMax(double alpha, double beta, int hare_position, IntList hounds_posi
       }
       if (value >= beta) 
       {
+        max_pruning++;
         return value;
       }
       if (value > alpha) 
@@ -397,6 +415,7 @@ double playMax(double alpha, double beta, int hare_position, IntList hounds_posi
       }
       if (value >= beta) 
       {
+        max_pruning++;
         return value;
       }
       if (value > alpha) 
@@ -426,6 +445,12 @@ int convert_key(int hare_position, IntList hounds_position)
 
 double playMin(double alpha, double beta, int hare_position, IntList hounds_position, int hounds_countdown, int depth)
 {
+  if (max_depth < depth)
+  {
+    max_depth = depth;
+  }
+  num_nodes++;
+  
   int winner = who_win(hare_position, hounds_position, hounds_countdown);
   //output.println("min depth " + depth + " position: " + hare_position + " " + hounds_position + " winner:" + winner);
   if (winner != 0)
@@ -434,6 +459,7 @@ double playMin(double alpha, double beta, int hare_position, IntList hounds_posi
   }
   else if (depth > total_depth)
   {
+    //return 0;
     return eval_fn(hare_position, hounds_position, hounds_countdown, !you);
   }
 
@@ -454,6 +480,7 @@ double playMin(double alpha, double beta, int hare_position, IntList hounds_posi
       }
       if (value <= alpha) 
       {
+        min_pruning++;
         return value;
       }
       if (value < beta) 
@@ -488,6 +515,7 @@ double playMin(double alpha, double beta, int hare_position, IntList hounds_posi
       }
       if (value <= alpha) 
       {
+        min_pruning++;
         return value;
       }
       if (value < beta) 
