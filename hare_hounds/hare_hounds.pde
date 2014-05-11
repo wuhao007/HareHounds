@@ -2,6 +2,50 @@ import java.util.Map;
 import java.util.Arrays;
 import java.util.Random;
 
+/**
+ * Artificial Intelligence A Modern Approach (3rd Ed.): Page 173.<br>
+ * 
+ * <pre>
+ * <code>
+ * function ALPHA-BETA-SEARCH(state) returns an action
+ *   v = MAX-VALUE(state, -infinity, +infinity)
+ *   return the action in ACTIONS(state) with value v
+ *   
+ * function MAX-VALUE(state, alpha, beta) returns a utility value
+ *   if TERMINAL-TEST(state) then return UTILITY(state)
+ *   v = -infinity
+ *   for each a in ACTIONS(state) do
+ *     v = MAX(v, MIN-VALUE(RESULT(s, a), alpha, beta))
+ *     if v >= beta then return v
+ *     alpha = MAX(alpha, v)
+ *   return v
+ *   
+ * function MIN-VALUE(state, alpha, beta) returns a utility value
+ *   if TERMINAL-TEST(state) then return UTILITY(state)
+ *   v = infinity
+ *   for each a in ACTIONS(state) do
+ *     v = MIN(v, MAX-VALUE(RESULT(s,a), alpha, beta))
+ *     if v <= alpha then return v
+ *     beta = MIN(beta, v)
+ *   return v
+ * </code>
+ * </pre>
+ * 
+ * Figure 5.7 The alpha-beta search algorithm. Notice that these routines are
+ * the same as the MINIMAX functions in Figure 5.3, except for the two lines in
+ * each of MIN-VALUE and MAX-VALUE that maintain alpha and beta (and the
+ * bookkeeping to pass these parameters along).
+ * 
+ * @author Ruediger Lunde
+ * 
+ * @param <STATE>
+ *            Type which is used for states in the game.
+ * @param <ACTION>
+ *            Type which is used for actions in the game.
+ * @param <PLAYER>
+ *            Type which is used for players in the game.
+ */
+ 
 HashMap<Integer, IntList> hare_rules;
 HashMap<Integer, IntList> hound_rules;
 IntList xlist, ylist;
@@ -27,21 +71,23 @@ int total_depth;
 //PrintWriter output;
 Random random;
 
+//initial the state of hare and hounds
 void setup() {
-  you = false;
-  you_move = true;
-  stop = false;
-  random = new Random();
+  you = false; 
+  you_move = true; //used for change state
+  stop = false; //used for change state
+  random = new Random(); //used for evalation function
   //output = createWriter("positions.txt"); 
-  total_depth = 10;
+  total_depth = 10; // search depth
 
-  hounds = new IntList(Arrays.asList(0, 1, 3));
+  hounds = new IntList(Arrays.asList(0, 1, 3)); //hounds initial state
   default_setting();
   //hare_best_move = new HashMap<Integer, Integer>();
   //hounds_best_move = new HashMap<Integer, IntList>();
   //hounds_best_move = new IntList();
-  total_hounds_countdown = 10;
+  total_hounds_countdown = 10; //If the hounds move vertically ten times in a row, they are considered to be "stalling" and the hare wins
 
+  // use hash table to find the next state of hare
   hare_rules = new HashMap<Integer, IntList>();
   hare_rules.put(0, new IntList(Arrays.asList(1, 2, 3)));
   hare_rules.put(1, new IntList(Arrays.asList(0, 2, 4, 5)));
@@ -55,6 +101,7 @@ void setup() {
   hare_rules.put(9, new IntList(Arrays.asList(5, 6, 8, 10)));
   hare_rules.put(10, new IntList(Arrays.asList(7, 8, 9)));
 
+// use hash table to find the next state of hounds
   hound_rules = new HashMap<Integer, IntList>();
   hound_rules.put(0, new IntList(Arrays.asList(1, 2, 3)));
   hound_rules.put(1, new IntList(Arrays.asList(2, 4, 5)));
@@ -79,6 +126,7 @@ void setup() {
   size(img_grid.width, img_grid.height);
 }
 
+//draw the board, hare and hounds
 void draw() {
   image(img_grid, 0, 0);
   if (!stop)
@@ -139,6 +187,7 @@ void draw() {
   image(img_hare, img_grid.width-img_hare.width, img_grid.height-img_hare.height);
 }
 
+//use mouse to move hare and hounds and change sides
 void mousePressed() 
 {
   if (!stop)
@@ -217,6 +266,7 @@ void mousePressed()
   }
 }
 
+//the next state that hare can choose
 IntList hare_next_positions(int hare_position, IntList hounds_position)
 {
   IntList moves = new IntList();
@@ -230,6 +280,7 @@ IntList hare_next_positions(int hare_position, IntList hounds_position)
   return moves;
 }
 
+//the next state that a hound can choose
 IntList hound_next_positions(int hare_position, IntList hounds_position, int one)
 {
   IntList moves = new IntList();
@@ -243,6 +294,7 @@ IntList hound_next_positions(int hare_position, IntList hounds_position, int one
   return moves;
 }
 
+//the next state that hounds can choose
 ArrayList<IntList> hounds_next_positions(int hare_position, IntList hounds_position)
 {
   ArrayList<IntList> moves = new ArrayList<IntList>();
@@ -259,6 +311,7 @@ ArrayList<IntList> hounds_next_positions(int hare_position, IntList hounds_posit
   return moves;
 }
 
+//initial setting
 void default_setting()
 {
   hare = 10;
@@ -268,6 +321,7 @@ void default_setting()
   total_hounds_countdown = 10;
 }
 
+//move hare and hounds and change sides
 boolean overCircle(int x, int y)
 {
   return sqrt(sq(x - mouseX) + sq(y - mouseY)) < radius;
@@ -291,6 +345,7 @@ boolean cutoff_test(int winner, int depth)
  }
  */
 
+//monte carlo simulation
 int simulate(int hare_position, IntList hounds_position, int hounds_countdown, boolean side)
 {
   int winner = who_win(hare_position, hounds_position, hounds_countdown);
@@ -321,6 +376,7 @@ int simulate(int hare_position, IntList hounds_position, int hounds_countdown, b
   }
 }
 
+//evalation function it use monte carlo
 double eval_fn(int hare_position, IntList hounds_position, int hounds_countdown, boolean side)
 {
   int computer_side = 0;
@@ -335,6 +391,7 @@ double eval_fn(int hare_position, IntList hounds_position, int hounds_countdown,
   return computer_side/10.0;
 }
 
+//alpha and beta search algorithm max step
 double playMax(double alpha, double beta, int hare_position, IntList hounds_position, int hounds_countdown, int depth)
 {
   if (max_depth < depth)
@@ -433,6 +490,7 @@ double playMax(double alpha, double beta, int hare_position, IntList hounds_posi
   }
 }
 
+//used this as the key of the map, same like hash table
 int convert_key(int hare_position, IntList hounds_position)
 {
   int int_key = hare_position;
@@ -443,6 +501,8 @@ int convert_key(int hare_position, IntList hounds_position)
   return int_key;
 }
 
+
+//alpha and beta search algorithm min step
 double playMin(double alpha, double beta, int hare_position, IntList hounds_position, int hounds_countdown, int depth)
 {
   if (max_depth < depth)
@@ -533,6 +593,7 @@ double playMin(double alpha, double beta, int hare_position, IntList hounds_posi
   }
 }
 
+//get the collume, used for whether hounds move vertically
 int get_col(int position)
 {
   if (position == 0)
@@ -561,6 +622,7 @@ int get_col(int position)
   }
 }
 
+//if hounds move vertically, they in the same col
 boolean same_col(IntList a, IntList b)
 {
   int i = get_hound_index(a, b);
@@ -574,6 +636,7 @@ boolean same_col(IntList a, IntList b)
   }
 }
 
+//used for whether hounds move vertically 
 int get_hound_index(IntList a, IntList b)
 {
   for (int i = 0; i < a.size(); i++)
@@ -585,6 +648,8 @@ int get_hound_index(IntList a, IntList b)
   }
   return -1;
 }
+
+//check the winner of this game
 int who_win(int hare_position, IntList hounds_position, int hounds_countdown)
 {
   if (get_col(hare_position) <= get_col(hounds_position.min()))
@@ -626,6 +691,7 @@ int who_win(int hare_position, IntList hounds_position, int hounds_countdown)
   }
 }
 
+// check whether the game is over
 void gameover()
 {
   int result = who_win(hare, hounds, total_hounds_countdown);
@@ -645,6 +711,7 @@ void gameover()
   }
 }
 
+// use up to change different levels of difficulty
 void keyPressed() 
 {
   if (key == CODED) 
@@ -652,12 +719,12 @@ void keyPressed()
     if (keyCode == UP) 
     {
       total_depth++;
-      println(total_depth);
+      println("levels of difficulty ", total_depth);
     } 
     else if (keyCode == DOWN) 
     {
       total_depth--;
-      println(total_depth);
+      println("levels of difficulty ", total_depth);
     }
   } 
   else 
